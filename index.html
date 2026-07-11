@@ -262,6 +262,67 @@
   select.filter:hover { border-color: var(--ink-faint); }
   select.filter:focus { outline: none; border-color: var(--accent); }
 
+  /* ---- View toggling ---- */
+  #brandBtn { cursor: default; border-radius: 10px; padding: 4px; margin: -4px; transition: background .16s; }
+  body:not(.home-view) #brandBtn { cursor: pointer; }
+  body:not(.home-view) #brandBtn:hover { background: var(--panel-2); }
+  #brandBtn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .searchbar { margin-bottom: 22px; }
+  .searchbar .search { width: 100%; }
+  body.home-view #projectView { display: none; }
+  body:not(.home-view) #home { display: none; }
+
+  /* ---- Projects home ---- */
+  #home { display: flex; flex-direction: column; gap: 12px; }
+  .proj-card {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    display: flex;
+    align-items: stretch;
+    overflow: hidden;
+    transition: border-color .18s, box-shadow .18s, transform .18s;
+    position: relative;
+  }
+  .proj-card::before {
+    content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: var(--grad); opacity: .8;
+  }
+  .proj-card:hover { box-shadow: var(--shadow-lift); transform: translateY(-1px); }
+  .proj-open { flex: 1; min-width: 0; padding: 17px 20px 16px 22px; cursor: pointer; }
+  .proj-top { display: flex; align-items: baseline; gap: 12px; justify-content: space-between; }
+  .proj-name {
+    font-family: var(--display);
+    font-weight: 600;
+    font-size: 17px;
+    letter-spacing: -0.015em;
+    color: var(--ink);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .proj-count { font-family: var(--mono); font-size: 11px; color: var(--ink-dim); flex-shrink: 0; }
+  .proj-bar {
+    height: 5px; border-radius: 3px; background: var(--panel-2);
+    margin: 12px 0 11px; overflow: hidden; border: 1px solid var(--line-soft);
+  }
+  .proj-bar span { display: block; height: 100%; background: var(--grad); border-radius: 3px; transition: width .3s ease; }
+  .proj-meta { display: flex; gap: 14px; flex-wrap: wrap; align-items: center; font-family: var(--mono); font-size: 11px; }
+  .pc { display: inline-flex; align-items: center; gap: 5px; color: var(--ink-dim); }
+  .pc::before { content: ""; width: 6px; height: 6px; border-radius: 50%; }
+  .pc-open::before { background: var(--open); }
+  .pc-progress::before { background: var(--progress); }
+  .pc-done::before { background: var(--done); }
+  .proj-date { color: var(--ink-faint); margin-left: auto; }
+  .proj-actions {
+    display: flex; flex-direction: column; gap: 6px; justify-content: center;
+    padding: 12px 14px; border-left: 1px solid var(--line-soft); background: color-mix(in srgb, var(--panel-2) 40%, transparent);
+  }
+  button.sm { font-size: 11.5px; padding: 6px 11px; }
+  @media (max-width: 560px) {
+    .proj-card { flex-direction: column; }
+    .proj-actions { flex-direction: row; border-left: none; border-top: 1px solid var(--line-soft); justify-content: flex-end; }
+    .proj-date { margin-left: 0; width: 100%; }
+  }
+
   /* ---- Items ---- */
   .items { display: flex; flex-direction: column; gap: 11px; }
   .item {
@@ -516,6 +577,66 @@
     max-width: 700px;
   }
   .hint b { color: var(--ink); font-weight: 600; }
+
+  /* ---- User chip + shared-file controls ---- */
+  .userchip {
+    display: inline-flex; align-items: center; gap: 7px;
+    font-family: var(--sans); font-size: 12.5px; font-weight: 500;
+    background: var(--panel-2); color: var(--ink);
+    border: 1px solid var(--line); border-radius: 20px;
+    padding: 6px 13px 6px 10px; cursor: pointer;
+    transition: border-color .16s, background .16s;
+  }
+  .userchip:hover { border-color: var(--accent); background: var(--panel-hover); }
+  .userchip .udot { width: 8px; height: 8px; border-radius: 50%; background: var(--grad); flex-shrink: 0; box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent) 25%, transparent); }
+  #publishBtn { position: relative; }
+  #publishBtn.dirty::after {
+    content: ""; position: absolute; top: -3px; right: -3px;
+    width: 9px; height: 9px; border-radius: 50%;
+    background: var(--open); border: 2px solid var(--panel);
+  }
+  #publishBtn:not(.dirty) { opacity: .6; }
+  button.primary.alt { background: var(--panel-2); color: var(--ink); border: 1px solid var(--line); box-shadow: none; font-weight: 600; }
+  button.primary.alt:hover { border-color: var(--accent); background: var(--panel-hover); filter: none; box-shadow: none; }
+
+  /* ---- Attribution ---- */
+  .meta-by { font-family: var(--mono); font-size: 11px; color: var(--accent-2); }
+  .field-label .by { color: var(--accent-2); text-transform: none; letter-spacing: 0; }
+  .status-by { margin-top: 12px; font-family: var(--mono); font-size: 11px; color: var(--ink-faint); }
+  .status-by b { color: var(--ink-dim); font-weight: 600; }
+
+  /* ---- User picker + team modals ---- */
+  .sm-modal { max-width: 460px; }
+  .user-picker { display: flex; flex-direction: column; gap: 8px; }
+  .user-opt {
+    display: flex; align-items: center; gap: 10px;
+    padding: 11px 14px; border: 1px solid var(--line); border-radius: var(--radius-sm);
+    background: var(--panel-2); cursor: pointer; font-size: 14px; font-weight: 500;
+    transition: border-color .16s, background .16s;
+  }
+  .user-opt:hover { border-color: var(--accent); background: var(--panel-hover); }
+  .user-opt.current { border-color: var(--accent); }
+  .user-opt .av {
+    width: 26px; height: 26px; border-radius: 50%; flex-shrink: 0;
+    background: var(--grad); color: #fff; display: flex; align-items: center; justify-content: center;
+    font-family: var(--display); font-weight: 600; font-size: 12px;
+  }
+  .user-opt .tick { margin-left: auto; color: var(--accent); font-weight: 700; }
+  .user-empty { font-size: 13px; color: var(--ink-faint); font-style: italic; padding: 4px 0; }
+  .team-list { display: flex; flex-direction: column; gap: 7px; margin-top: 8px; }
+  .team-row {
+    display: flex; align-items: center; gap: 10px;
+    padding: 9px 12px; border: 1px solid var(--line); border-radius: var(--radius-sm); background: var(--panel-2);
+    font-size: 14px;
+  }
+  .team-row .av {
+    width: 24px; height: 24px; border-radius: 50%; flex-shrink: 0;
+    background: var(--grad); color: #fff; display: flex; align-items: center; justify-content: center;
+    font-family: var(--display); font-weight: 600; font-size: 11px;
+  }
+  .team-row .rm { margin-left: auto; }
+  .team-row .rm button { padding: 4px 9px; font-size: 11.5px; }
+
   .toast {
     position: fixed;
     bottom: 26px; left: 50%;
@@ -548,7 +669,7 @@
 <body>
 <header>
   <div class="head-row">
-    <div class="brand">
+    <div class="brand" id="brandBtn" role="button" tabindex="0" title="Back to all projects">
       <div class="mark" aria-label="Punch List logo">
         <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
           <circle class="punch" cx="5.5" cy="6.5" r="2.4"/>
@@ -564,35 +685,50 @@
       </div>
     </div>
     <div class="head-actions">
+      <button class="ghost" id="backBtn" title="All projects" style="display:none">&#8592; Projects</button>
+      <button class="userchip" id="userBtn" title="Switch who you are"><span class="udot"></span><span id="userName">Set name</span></button>
+      <button class="ghost" id="syncBtn" title="Pull latest from your repo">&#8635; Sync</button>
+      <button class="primary" id="publishBtn" title="Download the shared file to commit">Publish</button>
+      <span class="vr"></span>
+      <button class="ghost" id="teamBtn" title="Manage team">Team</button>
       <button class="ghost" id="themeBtn" title="Toggle light / dark" aria-label="Toggle theme"><span id="themeIcon">&#9789;</span></button>
       <span class="vr"></span>
       <button class="ghost" id="renameBtn">Rename</button>
-      <button class="ghost" id="importBtn">Import</button>
-      <button class="ghost" id="exportBtn">Export</button>
-      <button class="primary" id="addBtn">+ Add update</button>
+      <button class="ghost" id="importBtn" title="Import a single project (backup)">Import</button>
+      <button class="ghost" id="exportBtn" title="Export this project (backup)">Export</button>
+      <button class="primary alt" id="addBtn">+ Add update</button>
     </div>
   </div>
 </header>
 
 <div class="wrap">
-  <div class="hint" id="hint">
-    <b>How this works —</b> Everything saves to this browser automatically. To share with your developer, click <b>Export .json</b> and commit that file to your GitHub repo (or send it over). Your developer opens this same page, clicks <b>Import</b>, updates statuses and notes, then exports and sends the file back. The <b>.json</b> file is the single source of truth.
+  <div class="searchbar">
+    <input type="text" class="search" id="search" placeholder="Search…">
   </div>
 
-  <div class="stats" id="stats"></div>
+  <!-- Projects home -->
+  <div id="home"></div>
 
-  <div class="toolbar">
-    <input type="text" class="search" id="search" placeholder="Search updates, pages, notes…">
-    <select class="filter" id="pageFilter"><option value="">All pages</option></select>
-    <select class="filter" id="sortBy">
-      <option value="num">Sort: Newest first</option>
-      <option value="num-asc">Sort: Oldest first</option>
-      <option value="priority">Sort: Priority</option>
-      <option value="status">Sort: Status</option>
-    </select>
+  <!-- Single-project view -->
+  <div id="projectView">
+    <div class="hint" id="hint">
+      <b>How this works —</b> This page loads shared data from <b>punch-list-data.json</b> in your repo, so you and your team start from the same place. Make your edits (they save to this browser as you go), then click <b>Publish</b> to download the updated file and commit it to the repo. Others click <b>Sync</b> (or just reload) to pull the latest. <b>Import/Export</b> handle single-project backups.
+    </div>
+
+    <div class="stats" id="stats"></div>
+
+    <div class="toolbar" id="toolbar">
+      <select class="filter" id="pageFilter"><option value="">All pages</option></select>
+      <select class="filter" id="sortBy">
+        <option value="num">Sort: Newest first</option>
+        <option value="num-asc">Sort: Oldest first</option>
+        <option value="priority">Sort: Priority</option>
+        <option value="status">Sort: Status</option>
+      </select>
+    </div>
+
+    <div class="items" id="items"></div>
   </div>
-
-  <div class="items" id="items"></div>
 </div>
 
 <!-- Add/Edit Modal -->
@@ -647,12 +783,53 @@
 </div>
 
 <input type="file" id="importInput" accept="application/json" hidden>
+
+<!-- Who am I picker -->
+<div class="overlay" id="userModal">
+  <div class="modal sm-modal">
+    <h2>Who are you?</h2>
+    <div class="sub">Pick your name so your updates are labeled. No password needed.</div>
+    <div id="userPicker" class="user-picker"></div>
+    <div class="form-group" style="margin-top:16px">
+      <label>Not listed? Add yourself</label>
+      <div style="display:flex; gap:8px">
+        <input type="text" id="newUserName" placeholder="Your name">
+        <button class="primary" id="addSelfBtn" style="flex-shrink:0">Add</button>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="ghost" id="userCancelBtn">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- Team manager -->
+<div class="overlay" id="teamModal">
+  <div class="modal sm-modal">
+    <h2>Team</h2>
+    <div class="sub">Add the people who work on these punch lists. Names appear in the "who are you" picker and get stamped on updates.</div>
+    <div class="form-group">
+      <label>Add a team member</label>
+      <div style="display:flex; gap:8px">
+        <input type="text" id="newTeamName" placeholder="e.g. Alex (Developer)">
+        <button class="primary" id="addTeamBtn" style="flex-shrink:0">Add</button>
+      </div>
+    </div>
+    <div class="field-label">Current team</div>
+    <div id="teamList" class="team-list"></div>
+    <div class="modal-actions">
+      <button class="ghost" id="teamCloseBtn">Done</button>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
 (function () {
   "use strict";
-  const KEY = "wft_data_v1";
+  const KEY = "wft_data_v1";        // legacy single-project key (migrated)
+  const STORE_KEY = "wft_store_v1"; // new multi-project store
   const STATUS = {
     open:     { label: "Open",         cls: "open" },
     progress: { label: "In Progress",  cls: "progress" },
@@ -664,10 +841,17 @@
   const STATUS_RANK = { open: 0, progress: 1, done: 2, wontfix: 3 };
 
   const THEME_KEY = "wft_theme";
-  let data = load();
+  const USER_KEY = "wft_user";
+  // The page fetches this file (from the same folder as index.html) on load.
+  const SHARED_FILE = "punch-list-data.json";
+  let store = loadStore();   // { activeId, team, projects: {id: project} }
+  let data = null;           // the currently-open project (same shape as before), or null on home
   let editingId = null;
   let pendingShots = [];
   let filterStatus = "";
+  let homeSearch = "";
+  let currentUser = localStorage.getItem(USER_KEY) || "";
+  let dirty = false;         // are there local edits not yet published?
 
   const $ = (id) => document.getElementById(id);
 
@@ -690,26 +874,242 @@
     applyTheme(next);
   }
 
-  function load() {
+  function pid() { return "p_" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6); }
+
+  // Normalize a project object to the expected shape
+  function normalizeProject(p, fallbackName) {
+    const proj = {
+      id: p.id || pid(),
+      project: (p.project && String(p.project).trim()) || fallbackName || "Untitled project",
+      nextNum: p.nextNum || (Math.max(0, ...(p.items || []).map(i => i.num || 0)) + 1),
+      items: Array.isArray(p.items) ? p.items : [],
+      created: p.created || Date.now(),
+      updated: p.updated || Date.now()
+    };
+    if (proj.project === "Website Feedback Tracker") proj.project = "Punch List";
+    return proj;
+  }
+
+  function loadStore() {
+    // Prefer the new multi-project store
     try {
-      const raw = localStorage.getItem(KEY);
+      const raw = localStorage.getItem(STORE_KEY);
       if (raw) {
-        const d = JSON.parse(raw);
-        // One-time rebrand: update only if still on the old default name
-        if (d.project === "Website Feedback Tracker") d.project = "Punch List";
-        return d;
+        const s = JSON.parse(raw);
+        if (s && s.projects) { if (!Array.isArray(s.team)) s.team = []; return s; }
       }
     } catch (e) {}
-    return { project: "Punch List", nextNum: 1, items: [] };
-  }
-  function save() {
+    // Migrate a legacy single-project blob, if present
     try {
-      localStorage.setItem(KEY, JSON.stringify(data));
-      $("lastSaved").textContent = "saved " + new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
+      const legacy = localStorage.getItem(KEY);
+      if (legacy) {
+        const d = JSON.parse(legacy);
+        const proj = normalizeProject(d, "Punch List");
+        const s = { activeId: null, team: [], projects: { [proj.id]: proj } };
+        localStorage.setItem(STORE_KEY, JSON.stringify(s));
+        return s;
+      }
+    } catch (e) {}
+    // Fresh install
+    return { activeId: null, team: [], projects: {} };
+  }
+
+  /* ---------- Shared-file sync (repo is the source of truth) ---------- */
+  // Merge an incoming store (from the repo file) into local state.
+  // Per project: whichever copy has the newer "updated" wins. Local-only
+  // projects are kept; repo-only projects are added. Team lists are unioned.
+  function mergeStore(incoming) {
+    if (!incoming || !incoming.projects) return { added: 0, updated: 0, kept: 0 };
+    let added = 0, updatedC = 0, kept = 0;
+    Object.values(incoming.projects).forEach(rawP => {
+      const p = normalizeProject(rawP, "Imported project");
+      const local = store.projects[p.id];
+      if (!local) { store.projects[p.id] = p; added++; }
+      else if ((p.updated || 0) > (local.updated || 0)) { store.projects[p.id] = p; updatedC++; }
+      else kept++;
+    });
+    // Union team members (case-insensitive, keep first spelling)
+    const names = new Map((store.team || []).map(n => [n.toLowerCase(), n]));
+    (incoming.team || []).forEach(n => { if (!names.has(n.toLowerCase())) names.set(n.toLowerCase(), n); });
+    store.team = [...names.values()];
+    return { added, updated: updatedC, kept };
+  }
+
+  // Pull the shared file from the repo and merge it in.
+  async function pullShared(opts) {
+    opts = opts || {};
+    try {
+      const res = await fetch(SHARED_FILE + "?t=" + Date.now(), { cache: "no-store" });
+      if (!res.ok) throw new Error("not found");
+      const incoming = await res.json();
+      const r = mergeStore(incoming);
+      saveStore();
+      // If we're inside a project that got refreshed, re-point data at the new copy
+      if (data && store.projects[data.id]) data = store.projects[data.id];
+      render();
+      if (!opts.silent) {
+        if (r.added || r.updated) toast("Synced from repo \u00B7 " + r.added + " new, " + r.updated + " updated");
+        else toast("Already up to date");
+      }
+      return true;
     } catch (e) {
-      toast("Storage full — export your data as a file", true);
+      if (!opts.silent) toast("No shared file found yet \u2014 publish one to create it");
+      return false;
     }
   }
+
+  // Download the whole store as the shared repo file to commit.
+  function publishShared() {
+    const payload = Object.assign({ _type: "punch-list-store" }, store, {
+      publishedAt: Date.now(),
+      publishedBy: currentUser || "unknown"
+    });
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = SHARED_FILE;
+    a.click();
+    URL.revokeObjectURL(url);
+    dirty = false;
+    updateChrome();
+    toast("Downloaded " + SHARED_FILE + " \u2014 commit it to your repo");
+  }
+
+  function updatePublishState() {
+    const btn = $("publishBtn");
+    if (btn) btn.classList.toggle("dirty", dirty);
+  }
+
+  /* ---------- Team + current user ---------- */
+  function initials(name) {
+    const parts = String(name).trim().split(/\s+/).filter(Boolean);
+    if (!parts.length) return "?";
+    return (parts[0][0] + (parts[1] ? parts[1][0] : "")).toUpperCase();
+  }
+  function setUser(name) {
+    currentUser = name;
+    localStorage.setItem(USER_KEY, name);
+    updateChrome();
+  }
+  function addTeamMember(name) {
+    name = String(name || "").trim();
+    if (!name) return false;
+    if (!store.team) store.team = [];
+    if (store.team.some(n => n.toLowerCase() === name.toLowerCase())) { toast("Already on the team"); return false; }
+    store.team.push(name);
+    saveStore();
+    return true;
+  }
+  function removeTeamMember(name) {
+    store.team = (store.team || []).filter(n => n !== name);
+    saveStore();
+  }
+
+  function renderUserPicker() {
+    const el = $("userPicker");
+    const team = store.team || [];
+    if (!team.length) {
+      el.innerHTML = `<div class="user-empty">No team members yet. Add yourself below.</div>`;
+      return;
+    }
+    el.innerHTML = team.map(n =>
+      `<div class="user-opt ${n === currentUser ? "current" : ""}" data-name="${esc(n)}">
+        <span class="av">${esc(initials(n))}</span>
+        <span>${esc(n)}</span>
+        ${n === currentUser ? '<span class="tick">\u2713</span>' : ""}
+      </div>`).join("");
+    el.querySelectorAll(".user-opt").forEach(row => {
+      row.addEventListener("click", () => {
+        setUser(row.dataset.name);
+        closeOverlay("userModal");
+        toast("You are " + row.dataset.name);
+      });
+    });
+  }
+
+  function renderTeamList() {
+    const el = $("teamList");
+    const team = store.team || [];
+    if (!team.length) { el.innerHTML = `<div class="user-empty">No one added yet.</div>`; return; }
+    el.innerHTML = team.map(n =>
+      `<div class="team-row">
+        <span class="av">${esc(initials(n))}</span>
+        <span>${esc(n)}</span>
+        <span class="rm"><button class="ghost danger" data-rm="${esc(n)}">Remove</button></span>
+      </div>`).join("");
+    el.querySelectorAll("[data-rm]").forEach(b => {
+      b.addEventListener("click", () => {
+        const name = b.dataset.rm;
+        removeTeamMember(name);
+        if (currentUser === name) setUser("");
+        renderTeamList();
+      });
+    });
+  }
+
+  function openOverlay(id) { $(id).classList.add("show"); }
+  function closeOverlay(id) { $(id).classList.remove("show"); }
+
+
+  function saveStore() {
+    try {
+      localStorage.setItem(STORE_KEY, JSON.stringify(store));
+      if (data) $("lastSaved").textContent = "saved " + new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
+    } catch (e) {
+      toast("Storage full — export a project to free space");
+    }
+    dirty = true;
+    if (typeof updatePublishState === "function") updatePublishState();
+  }
+
+  // Persist the currently-open project back into the store
+  function save() {
+    if (!data) return;
+    data.updated = Date.now();
+    store.projects[data.id] = data;
+    saveStore();
+  }
+
+  function projectList() {
+    return Object.values(store.projects).sort((a, b) => (b.updated || 0) - (a.updated || 0));
+  }
+
+  function openProject(id) {
+    const p = store.projects[id];
+    if (!p) return;
+    data = p;
+    store.activeId = id;
+    filterStatus = "";
+    $("search").value = "";
+    $("pageFilter").value = "";
+    saveStore();
+    render();
+    window.scrollTo({ top: 0 });
+  }
+
+  function goHome() {
+    data = null;
+    store.activeId = null;
+    saveStore();
+    render();
+    window.scrollTo({ top: 0 });
+  }
+
+  function createProject(name) {
+    const proj = normalizeProject({ project: name }, name);
+    store.projects[proj.id] = proj;
+    saveStore();
+    openProject(proj.id);
+  }
+
+  function deleteProject(id) {
+    delete store.projects[id];
+    if (store.activeId === id) { store.activeId = null; data = null; }
+    saveStore();
+    render();
+  }
+
   function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 7); }
 
   function toast(msg) {
@@ -722,10 +1122,98 @@
 
   /* ---------- Rendering ---------- */
   function render() {
-    $("projectTitle").textContent = data.project;
-    renderStats();
-    renderPageFilter();
-    renderItems();
+    if (data) {
+      document.body.classList.remove("home-view");
+      $("projectTitle").textContent = data.project;
+      renderStats();
+      renderPageFilter();
+      renderItems();
+    } else {
+      document.body.classList.add("home-view");
+      $("projectTitle").textContent = "Punch List";
+      renderHome();
+    }
+    updateChrome();
+  }
+
+  // Show/hide toolbar buttons depending on view
+  function updateChrome() {
+    const onProject = !!data;
+    $("renameBtn").style.display = onProject ? "" : "none";
+    $("exportBtn").style.display = onProject ? "" : "none";
+    $("addBtn").textContent = onProject ? "+ Add update" : "+ New project";
+    $("backBtn").style.display = onProject ? "" : "none";
+    $("lastSaved").textContent = onProject ? "local" : (projectList().length + " project" + (projectList().length === 1 ? "" : "s"));
+    if (onProject) {
+      $("search").placeholder = "Search updates, pages, notes…";
+    } else {
+      $("search").placeholder = "Search projects…";
+      $("search").value = homeSearch;
+    }
+    $("userName").textContent = currentUser || "Set name";
+    updatePublishState();
+  }
+
+  function renderHome() {
+    const q = homeSearch.trim().toLowerCase();
+    let projs = projectList();
+    if (q) projs = projs.filter(p => p.project.toLowerCase().includes(q));
+
+    const el = $("home");
+    if (!projectList().length) {
+      el.innerHTML = `<div class="empty-state">
+        <div class="mark">/</div>
+        <div class="big">No projects yet.</div>
+        <div>Click \u201C+ New project\u201D to start your first punch list.</div>
+      </div>`;
+      return;
+    }
+    if (!projs.length) {
+      el.innerHTML = `<div class="empty-state"><div class="big">No projects match \u201C${esc(homeSearch)}\u201D.</div></div>`;
+      return;
+    }
+
+    el.innerHTML = projs.map(p => {
+      const items = p.items || [];
+      const open = items.filter(i => i.status === "open").length;
+      const progress = items.filter(i => i.status === "progress").length;
+      const done = items.filter(i => i.status === "done").length;
+      const total = items.length;
+      const pct = total ? Math.round((done / total) * 100) : 0;
+      return `<div class="proj-card" data-id="${p.id}">
+        <div class="proj-open" data-open>
+          <div class="proj-top">
+            <div class="proj-name">${esc(p.project)}</div>
+            <div class="proj-count">${total} item${total === 1 ? "" : "s"}</div>
+          </div>
+          <div class="proj-bar"><span style="width:${pct}%"></span></div>
+          <div class="proj-meta">
+            <span class="pc pc-open">${open} open</span>
+            <span class="pc pc-progress">${progress} in progress</span>
+            <span class="pc pc-done">${done} done</span>
+            <span class="proj-date">${pct}% complete \u00B7 ${fmtDate(p.updated)}</span>
+          </div>
+        </div>
+        <div class="proj-actions">
+          <button class="ghost sm" data-export title="Export this project">Export</button>
+          <button class="ghost sm danger" data-del title="Delete project">Delete</button>
+        </div>
+      </div>`;
+    }).join("");
+
+    el.querySelectorAll(".proj-card").forEach(node => {
+      const id = node.dataset.id;
+      node.querySelector("[data-open]").addEventListener("click", () => openProject(id));
+      node.querySelector("[data-export]").addEventListener("click", (e) => { e.stopPropagation(); exportProject(id); });
+      node.querySelector("[data-del]").addEventListener("click", (e) => {
+        e.stopPropagation();
+        const p = store.projects[id];
+        if (confirm(`Delete project \u201C${p.project}\u201D and all its ${(p.items||[]).length} items? This can't be undone.`)) {
+          deleteProject(id);
+          toast("Project deleted");
+        }
+      });
+    });
   }
 
   function renderStats() {
@@ -798,6 +1286,7 @@
               ${i.page ? `<span class="pill page">${esc(i.page)}</span>` : ""}
               <span class="pill pri-${i.priority}">${PRIORITY[i.priority]}</span>
               ${shots.length ? `<span class="has-img">\u25A3 ${shots.length}</span>` : ""}
+              ${i.author ? `<span class="meta-by">by ${esc(i.author)}</span>` : ""}
               <span class="meta-date">${fmtDate(i.created)}</span>
             </div>
           </div>
@@ -812,8 +1301,9 @@
           ${shots.length ? `<div class="field-label">Screenshots</div><div class="shots">${
             shots.map((src, idx) => `<img src="${src}" data-lb="${i.id}:${idx}" alt="screenshot">`).join("")
           }</div>` : ""}
-          <div class="field-label">Developer status note</div>
+          <div class="field-label">Developer status note${i.noteBy ? ` \u00B7 <span class="by">${esc(i.noteBy)}</span>` : ""}</div>
           <div class="dev-note ${i.devNote ? "" : "empty"}">${i.devNote ? esc(i.devNote) : "No note yet — developer can add a response here."}</div>
+          ${i.statusBy ? `<div class="status-by">Status set to <b>${STATUS[i.status].label}</b> by ${esc(i.statusBy)}${i.statusAt ? " \u00B7 " + fmtDate(i.statusAt) : ""}</div>` : ""}
           <div class="item-controls">
             <button class="ghost" data-edit>Edit</button>
             <button class="ghost danger" data-delete>Delete</button>
@@ -832,6 +1322,8 @@
       node.querySelector("[data-statuschange]").addEventListener("change", (e) => {
         const it = data.items.find(x => x.id === id);
         it.status = e.target.value;
+        it.statusBy = currentUser || "";
+        it.statusAt = Date.now();
         save(); render();
       });
       const editB = node.querySelector("[data-edit]");
@@ -926,49 +1418,83 @@
   function saveItem() {
     const title = $("fTitle").value.trim();
     if (!title) { toast("Add a title first"); $("fTitle").focus(); return; }
+    const newNote = $("fDevNote").value.trim();
     const payload = {
       title,
       page: $("fPage").value.trim(),
       priority: $("fPriority").value,
       desc: $("fDesc").value.trim(),
-      devNote: $("fDevNote").value.trim(),
+      devNote: newNote,
       shots: pendingShots.slice()
     };
     if (editingId) {
       const it = data.items.find(x => x.id === editingId);
+      const noteChanged = (it.devNote || "") !== newNote;
       Object.assign(it, payload, { updated: Date.now() });
+      if (noteChanged && newNote) { it.noteBy = currentUser || ""; it.noteAt = Date.now(); }
+      if (noteChanged && !newNote) { delete it.noteBy; delete it.noteAt; }
     } else {
-      data.items.push(Object.assign({
-        id: uid(), num: data.nextNum++, status: "open", created: Date.now()
-      }, payload));
+      const item = Object.assign({
+        id: uid(), num: data.nextNum++, status: "open", created: Date.now(),
+        author: currentUser || ""
+      }, payload);
+      if (newNote) { item.noteBy = currentUser || ""; item.noteAt = Date.now(); }
+      data.items.push(item);
     }
     save(); render(); closeModal();
     toast(editingId ? "Update saved" : "Update added");
   }
 
-  /* ---------- Import / Export ---------- */
-  function exportData() {
-    const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+  /* ---------- Import / Export (per project) ---------- */
+  function slugify(s) {
+    return String(s || "project").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 40) || "project";
+  }
+  function exportProject(id) {
+    const p = store.projects[id] || data;
+    if (!p) return;
+    // Mark the payload so imports can be recognized as a Punch List project file
+    const payload = Object.assign({ _type: "punch-list-project" }, p);
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     const stamp = new Date().toISOString().slice(0, 10);
     a.href = url;
-    a.download = "feedback-tracker-" + stamp + ".json";
+    a.download = "punchlist-" + slugify(p.project) + "-" + stamp + ".json";
     a.click();
     URL.revokeObjectURL(url);
-    toast("Exported — commit this file to GitHub");
+    toast("Exported \u201C" + p.project + "\u201D");
   }
+  function exportData() { if (data) exportProject(data.id); }
+
   function importData(file) {
     const r = new FileReader();
     r.onload = () => {
       try {
         const parsed = JSON.parse(r.result);
         if (!parsed.items || !Array.isArray(parsed.items)) throw new Error("bad");
-        if (data.items.length && !confirm("Replace all current data with the imported file?")) return;
-        data = parsed;
-        if (!data.nextNum) data.nextNum = Math.max(0, ...data.items.map(i => i.num || 0)) + 1;
-        save(); render();
-        toast("Imported " + data.items.length + " updates");
+        const incoming = normalizeProject(parsed, "Imported project");
+
+        // Does a project with this id already exist?
+        const existing = store.projects[incoming.id];
+        if (existing) {
+          const choice = confirm(
+            `A project \u201C${existing.project}\u201D already exists.\n\n` +
+            `OK = replace it with the imported version\n` +
+            `Cancel = import as a separate copy`
+          );
+          if (choice) {
+            store.projects[incoming.id] = incoming;
+          } else {
+            incoming.id = pid();
+            incoming.project = incoming.project + " (copy)";
+            store.projects[incoming.id] = incoming;
+          }
+        } else {
+          store.projects[incoming.id] = incoming;
+        }
+        saveStore();
+        openProject(incoming.id);
+        toast("Imported \u201C" + incoming.project + "\u201D \u00B7 " + incoming.items.length + " items");
       } catch (e) { toast("Couldn't read that file"); }
     };
     r.readAsText(file);
@@ -988,12 +1514,25 @@
 
   /* ---------- Wire up ---------- */
   $("themeBtn").onclick = toggleTheme;
-  $("addBtn").onclick = () => openModal(null);
+
+  function newProjectFlow() {
+    const name = prompt("New project name:", "");
+    if (name && name.trim()) createProject(name.trim());
+  }
+
+  $("addBtn").onclick = () => { if (data) openModal(null); else newProjectFlow(); };
+  $("backBtn").onclick = goHome;
+  $("brandBtn").onclick = () => { if (data) goHome(); };
+  $("brandBtn").addEventListener("keydown", (e) => { if ((e.key === "Enter" || e.key === " ") && data) { e.preventDefault(); goHome(); } });
   $("cancelBtn").onclick = closeModal;
   $("saveBtn").onclick = saveItem;
   $("modal").addEventListener("click", (e) => { if (e.target === $("modal")) closeModal(); });
 
-  $("search").addEventListener("input", renderItems);
+  // Search box serves both views
+  $("search").addEventListener("input", () => {
+    if (data) renderItems();
+    else { homeSearch = $("search").value; renderHome(); }
+  });
   $("pageFilter").addEventListener("change", renderItems);
   $("sortBy").addEventListener("change", renderItems);
 
@@ -1002,9 +1541,37 @@
   $("importInput").addEventListener("change", (e) => { if (e.target.files[0]) importData(e.target.files[0]); e.target.value=""; });
 
   $("renameBtn").onclick = () => {
+    if (!data) return;
     const name = prompt("Project name:", data.project);
     if (name && name.trim()) { data.project = name.trim(); save(); render(); }
   };
+
+  // Shared-file: sync + publish
+  $("syncBtn").onclick = () => pullShared({ silent: false });
+  $("publishBtn").onclick = publishShared;
+
+  // Team + user picker
+  $("teamBtn").onclick = () => { renderTeamList(); openOverlay("teamModal"); };
+  $("teamCloseBtn").onclick = () => closeOverlay("teamModal");
+  $("teamModal").addEventListener("click", (e) => { if (e.target === $("teamModal")) closeOverlay("teamModal"); });
+  $("addTeamBtn").onclick = () => {
+    if (addTeamMember($("newTeamName").value)) { $("newTeamName").value = ""; renderTeamList(); }
+  };
+  $("newTeamName").addEventListener("keydown", (e) => { if (e.key === "Enter") $("addTeamBtn").click(); });
+
+  $("userBtn").onclick = () => { renderUserPicker(); openOverlay("userModal"); };
+  $("userCancelBtn").onclick = () => closeOverlay("userModal");
+  $("userModal").addEventListener("click", (e) => { if (e.target === $("userModal")) closeOverlay("userModal"); });
+  $("addSelfBtn").onclick = () => {
+    const name = $("newUserName").value.trim();
+    if (!name) return;
+    addTeamMember(name);
+    setUser(name);
+    $("newUserName").value = "";
+    closeOverlay("userModal");
+    toast("You are " + name);
+  };
+  $("newUserName").addEventListener("keydown", (e) => { if (e.key === "Enter") $("addSelfBtn").click(); });
 
   // File input / drop / paste
   $("drop").onclick = () => $("fileInput").click();
@@ -1025,11 +1592,25 @@
   $("closeLb").onclick = () => $("lightbox").classList.remove("show");
   $("lightbox").addEventListener("click", (e) => { if (e.target === $("lightbox")) $("lightbox").classList.remove("show"); });
   document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape") { closeModal(); $("lightbox").classList.remove("show"); }
+    if (e.key === "Escape") { closeModal(); ["lightbox","userModal","teamModal"].forEach(closeOverlay); }
   });
 
   initTheme();
+  // Restore the last-open project, if it still exists; otherwise show the projects home
+  if (store.activeId && store.projects[store.activeId]) {
+    data = store.projects[store.activeId];
+  } else {
+    data = null;
+    store.activeId = null;
+  }
   render();
+  dirty = false; updatePublishState();
+
+  // Pull the shared file from the repo on load (merges without clobbering local edits),
+  // then prompt for identity if not set yet.
+  pullShared({ silent: true }).finally(() => {
+    if (!currentUser && (store.team || []).length) { renderUserPicker(); openOverlay("userModal"); }
+  });
 })();
 </script>
 </body>
