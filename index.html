@@ -1,0 +1,1015 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Website Feedback Tracker</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;450;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --radius: 10px;
+    --radius-sm: 7px;
+    --mono: 'JetBrains Mono', 'SFMono-Regular', ui-monospace, 'Cascadia Code', Consolas, monospace;
+    --sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    --display: 'Space Grotesk', 'Inter', system-ui, sans-serif;
+  }
+  [data-theme="dark"] {
+    --bg: #0d1218;
+    --bg-2: #10161d;
+    --panel: #171f29;
+    --panel-2: #1e2732;
+    --panel-hover: #202b37;
+    --line: #29343f;
+    --line-soft: #212a34;
+    --ink: #eef2f6;
+    --ink-dim: #93a2b3;
+    --ink-faint: #5b6976;
+    --accent: #45c4b0;
+    --accent-2: #38b8f0;
+    --accent-ink: #06121a;
+    --accent-glow: rgba(69,196,176,.14);
+    --open: #eab040;
+    --progress: #52a6e6;
+    --done: #4cc487;
+    --wontfix: #7d8896;
+    --danger: #ec6a6a;
+    --on-status: rgba(6,14,20,.9);
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 4px 16px -8px rgba(0,0,0,.5);
+    --shadow-lift: 0 2px 6px rgba(0,0,0,.35), 0 20px 44px -20px rgba(0,0,0,.7);
+    --grad: linear-gradient(135deg, #45c4b0, #38b8f0);
+  }
+  [data-theme="light"] {
+    --bg: #eef1f5;
+    --bg-2: #e8ecf1;
+    --panel: #ffffff;
+    --panel-2: #f3f6f9;
+    --panel-hover: #f7f9fb;
+    --line: #dde3ea;
+    --line-soft: #e7ecf1;
+    --ink: #16202b;
+    --ink-dim: #566472;
+    --ink-faint: #96a3b1;
+    --accent: #12a594;
+    --accent-2: #1183c9;
+    --accent-ink: #ffffff;
+    --accent-glow: rgba(18,165,148,.10);
+    --open: #bd7d15;
+    --progress: #2379bd;
+    --done: #1f9d5f;
+    --wontfix: #78838f;
+    --danger: #cf3d3d;
+    --on-status: #ffffff;
+    --shadow: 0 1px 2px rgba(30,50,70,.06), 0 4px 14px -8px rgba(30,50,70,.16);
+    --shadow-lift: 0 2px 6px rgba(30,50,70,.08), 0 20px 44px -22px rgba(30,50,70,.28);
+    --grad: linear-gradient(135deg, #12a594, #1183c9);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: var(--sans);
+    background:
+      radial-gradient(1100px 500px at 100% -5%, var(--accent-glow), transparent 60%),
+      var(--bg);
+    background-attachment: fixed;
+    color: var(--ink);
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    transition: background .25s ease, color .25s ease;
+  }
+  ::selection { background: var(--accent); color: var(--accent-ink); }
+  #themeBtn { font-size: 15px; line-height: 1; padding: 7px 11px; }
+
+  /* ---- Header ---- */
+  header {
+    background: color-mix(in srgb, var(--panel) 82%, transparent);
+    backdrop-filter: saturate(1.5) blur(12px);
+    border-bottom: 1px solid var(--line);
+    padding: 16px 24px;
+    position: sticky;
+    top: 0;
+    z-index: 50;
+  }
+  .head-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+    max-width: 1160px;
+    margin: 0 auto;
+  }
+  .brand { display: flex; align-items: center; gap: 12px; }
+  .brand .mark {
+    width: 30px; height: 30px;
+    border-radius: 9px;
+    background: var(--grad);
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: 16px;
+    color: #fff;
+    flex-shrink: 0;
+    box-shadow: 0 2px 8px -2px var(--accent-glow), inset 0 1px 0 rgba(255,255,255,.25);
+    letter-spacing: -0.03em;
+  }
+  .brand-text { display: flex; flex-direction: column; gap: 1px; }
+  .brand h1 {
+    font-family: var(--display);
+    font-size: 17px;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+  }
+  .brand .tag {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--ink-faint);
+    letter-spacing: 0.04em;
+  }
+  .head-actions { margin-left: auto; display: flex; gap: 7px; flex-wrap: wrap; align-items: center; }
+  .vr { width: 1px; height: 22px; background: var(--line); margin: 0 2px; }
+
+  button {
+    font-family: var(--sans);
+    font-size: 13px;
+    font-weight: 500;
+    border: 1px solid var(--line);
+    background: var(--panel-2);
+    color: var(--ink);
+    padding: 8px 14px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: border-color .16s, background .16s, transform .05s, box-shadow .16s;
+  }
+  button:hover { border-color: var(--accent); background: var(--panel-hover); }
+  button:active { transform: translateY(1px); }
+  button.primary {
+    background: var(--grad);
+    color: #fff;
+    border: none;
+    font-weight: 600;
+    padding: 9px 16px;
+    box-shadow: 0 2px 10px -3px var(--accent-glow);
+  }
+  button.primary:hover { filter: brightness(1.06); box-shadow: 0 4px 16px -4px var(--accent-glow); }
+  button.ghost { background: transparent; }
+  button.ghost:hover { background: var(--panel-2); }
+  button.danger:hover { border-color: var(--danger); color: var(--danger); background: transparent; }
+
+  /* ---- Toolbar ---- */
+  .wrap { max-width: 1160px; margin: 0 auto; padding: 28px 24px 90px; }
+  .stats {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 24px;
+  }
+  .stat {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 13px 18px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    cursor: pointer;
+    transition: border-color .16s, background .16s, transform .12s, box-shadow .16s;
+    user-select: none;
+    position: relative;
+    overflow: hidden;
+    box-shadow: var(--shadow);
+    min-width: 92px;
+  }
+  .stat::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: var(--dot-c, var(--ink-faint));
+    opacity: 0;
+    transition: opacity .16s;
+  }
+  .stat:hover { border-color: var(--line); background: var(--panel-hover); transform: translateY(-1px); box-shadow: var(--shadow-lift); }
+  .stat.active { border-color: color-mix(in srgb, var(--dot-c) 45%, var(--line)); }
+  .stat.active::before { opacity: 1; }
+  .stat .n {
+    font-family: var(--display);
+    font-weight: 600;
+    font-size: 24px;
+    line-height: 1;
+    letter-spacing: -0.02em;
+    font-feature-settings: "tnum" 1;
+  }
+  .stat .lbl {
+    font-family: var(--mono);
+    font-size: 9.5px;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--ink-dim);
+    display: flex; align-items: center; gap: 6px;
+  }
+  .stat .lbl .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--dot-c, var(--ink-faint)); }
+  .stat[data-k="all"]      { --dot-c: var(--ink-dim); }
+  .stat[data-k="open"]     { --dot-c: var(--open); }
+  .stat[data-k="progress"] { --dot-c: var(--progress); }
+  .stat[data-k="done"]     { --dot-c: var(--done); }
+  .stat[data-k="wontfix"]  { --dot-c: var(--wontfix); }
+
+  .toolbar {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 18px;
+    flex-wrap: wrap;
+  }
+  .search {
+    flex: 1;
+    min-width: 200px;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-sm);
+    padding: 11px 15px 11px 38px;
+    color: var(--ink);
+    font-size: 14px;
+    font-family: var(--sans);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2393a2b3' stroke-width='2' stroke-linecap='round'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cpath d='m21 21-4.3-4.3'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: 13px center;
+    transition: border-color .16s, box-shadow .16s;
+  }
+  .search::placeholder { color: var(--ink-faint); }
+  .search:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow); }
+  select.filter {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-sm);
+    padding: 10px 13px;
+    color: var(--ink-dim);
+    font-size: 13px;
+    font-family: var(--sans);
+    cursor: pointer;
+    transition: border-color .16s;
+  }
+  select.filter:hover { border-color: var(--ink-faint); }
+  select.filter:focus { outline: none; border-color: var(--accent); }
+
+  /* ---- Items ---- */
+  .items { display: flex; flex-direction: column; gap: 11px; }
+  .item {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: var(--shadow);
+    transition: border-color .18s, box-shadow .18s, transform .18s;
+    position: relative;
+  }
+  .item::before {
+    content: "";
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+    background: var(--edge, transparent);
+    transition: background .18s;
+  }
+  .item[data-status="open"]     { --edge: var(--open); }
+  .item[data-status="progress"] { --edge: var(--progress); }
+  .item[data-status="done"]     { --edge: var(--done); }
+  .item[data-status="wontfix"]  { --edge: var(--wontfix); opacity: .68; }
+  .item[data-status="wontfix"] .item-title { text-decoration: line-through; text-decoration-color: var(--ink-faint); }
+  .item:hover { box-shadow: var(--shadow-lift); transform: translateY(-1px); border-color: var(--line); }
+
+  .item-head {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 15px 18px 15px 20px;
+    cursor: pointer;
+  }
+  .item-num {
+    font-family: var(--display);
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--ink-faint);
+    letter-spacing: -0.01em;
+    padding-top: 2px;
+    min-width: 30px;
+    font-feature-settings: "tnum" 1;
+  }
+  .item-num .hash { color: var(--line); font-weight: 500; }
+  .item-main { flex: 1; min-width: 0; }
+  .item-title { font-family: var(--display); font-weight: 500; font-size: 15.5px; letter-spacing: -0.01em; line-height: 1.35; word-wrap: break-word; }
+  .item-meta {
+    display: flex;
+    gap: 9px;
+    flex-wrap: wrap;
+    margin-top: 7px;
+    font-size: 12px;
+    color: var(--ink-dim);
+    align-items: center;
+  }
+  .pill {
+    font-family: var(--mono);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 3px 8px;
+    border-radius: 5px;
+    font-weight: 500;
+    display: inline-flex; align-items: center; gap: 5px;
+  }
+  .pill.page { background: var(--panel-2); color: var(--ink-dim); border: 1px solid var(--line); }
+  .pill.pri-high { background: color-mix(in srgb, var(--danger) 14%, transparent); color: var(--danger); }
+  .pill.pri-med { background: color-mix(in srgb, var(--open) 15%, transparent); color: var(--open); }
+  .pill.pri-low { background: color-mix(in srgb, var(--wontfix) 16%, transparent); color: var(--ink-dim); }
+  .pill.pri-high::before, .pill.pri-med::before, .pill.pri-low::before {
+    content: ""; width: 5px; height: 5px; border-radius: 50%; background: currentColor;
+  }
+  .has-img { color: var(--accent-2); font-size: 11.5px; font-family: var(--mono); display: inline-flex; align-items: center; gap: 4px; }
+  .meta-date { font-family: var(--mono); font-size: 11px; color: var(--ink-faint); }
+
+  .status-select {
+    font-family: var(--mono);
+    font-size: 10.5px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border: none;
+    border-radius: 6px;
+    padding: 6px 9px;
+    cursor: pointer;
+    color: #fff;
+    flex-shrink: 0;
+    transition: filter .15s;
+  }
+  .status-select:hover { filter: brightness(1.06); }
+  .status-select:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+  .status-select.open { background: var(--open); color: var(--on-status); }
+  .status-select.progress { background: var(--progress); color: var(--on-status); }
+  .status-select.done { background: var(--done); color: var(--on-status); }
+  .status-select.wontfix { background: var(--wontfix); color: #fff; }
+
+  .item-body {
+    padding: 4px 20px 20px 64px;
+    display: none;
+    animation: reveal .26s ease;
+  }
+  @keyframes reveal { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
+  .item.expanded .item-body { display: block; }
+  .item-body::before {
+    content: ""; display: block; height: 1px; background: var(--line-soft); margin-bottom: 16px;
+  }
+  .field-label {
+    font-family: var(--mono);
+    font-size: 9.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--ink-faint);
+    margin-bottom: 7px;
+    margin-top: 18px;
+  }
+  .field-label:first-of-type { margin-top: 0; }
+  .desc-text { font-size: 14px; color: var(--ink-dim); white-space: pre-wrap; word-wrap: break-word; line-height: 1.6; }
+  .dev-note {
+    background: var(--panel-2);
+    border: 1px solid var(--line);
+    border-left: 2px solid var(--accent);
+    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+    padding: 11px 14px;
+    font-size: 14px;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    color: var(--ink-dim);
+    line-height: 1.55;
+  }
+  .dev-note.empty { color: var(--ink-faint); font-style: italic; border-left-color: var(--line); }
+  .shots { display: flex; gap: 9px; flex-wrap: wrap; margin-top: 2px; }
+  .shots img {
+    max-width: 148px;
+    max-height: 104px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--line);
+    cursor: zoom-in;
+    object-fit: cover;
+    transition: border-color .15s, transform .15s;
+  }
+  .shots img:hover { border-color: var(--accent); transform: scale(1.015); }
+  .item-controls { display: flex; gap: 8px; margin-top: 20px; flex-wrap: wrap; }
+
+  /* ---- Modal / Lightbox ---- */
+  .overlay {
+    position: fixed;
+    inset: 0;
+    background: color-mix(in srgb, var(--bg) 25%, rgba(4,8,12,.72));
+    backdrop-filter: blur(4px);
+    display: none;
+    align-items: flex-start;
+    justify-content: center;
+    z-index: 100;
+    padding: 44px 20px;
+    overflow-y: auto;
+  }
+  .overlay.show { display: flex; animation: fade .18s ease; }
+  @keyframes fade { from { opacity: 0; } to { opacity: 1; } }
+  .modal {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    width: 100%;
+    max-width: 600px;
+    padding: 30px 32px 26px;
+    box-shadow: var(--shadow-lift);
+    animation: pop .28s cubic-bezier(.2,.9,.3,1.1);
+  }
+  @keyframes pop { from { opacity: 0; transform: translateY(12px) scale(.985); } to { opacity: 1; transform: none; } }
+  .modal h2 { font-family: var(--display); font-size: 21px; font-weight: 600; letter-spacing: -0.02em; margin-bottom: 4px; }
+  .modal .sub { font-size: 13px; color: var(--ink-dim); margin-bottom: 24px; }
+  .form-group { margin-bottom: 18px; }
+  .form-group > label {
+    display: block;
+    font-family: var(--mono);
+    font-size: 9.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--ink-dim);
+    margin-bottom: 7px;
+  }
+  .form-group input[type=text],
+  .form-group textarea,
+  .form-group select {
+    width: 100%;
+    background: var(--bg-2);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-sm);
+    padding: 11px 13px;
+    color: var(--ink);
+    font-size: 14px;
+    font-family: var(--sans);
+    transition: border-color .16s, box-shadow .16s, background .16s;
+  }
+  .form-group textarea { resize: vertical; min-height: 82px; line-height: 1.55; }
+  .form-group input:focus,
+  .form-group textarea:focus,
+  .form-group select:focus { outline: none; border-color: var(--accent); background: var(--panel); box-shadow: 0 0 0 3px var(--accent-glow); }
+  .form-row { display: flex; gap: 14px; }
+  .form-row .form-group { flex: 1; }
+  .drop {
+    border: 1.5px dashed var(--line);
+    border-radius: var(--radius-sm);
+    padding: 20px;
+    text-align: center;
+    color: var(--ink-dim);
+    font-size: 13px;
+    cursor: pointer;
+    transition: border-color .16s, background .16s, color .16s;
+  }
+  .drop:hover, .drop.drag { border-color: var(--accent); background: var(--panel-2); color: var(--ink); }
+  .thumbs { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+  .thumb { position: relative; }
+  .thumb img { width: 72px; height: 54px; object-fit: cover; border-radius: 5px; border: 1px solid var(--line); }
+  .thumb .x {
+    position: absolute; top: -7px; right: -7px;
+    width: 20px; height: 20px; border-radius: 50%;
+    background: var(--danger); color: #fff; border: none;
+    font-size: 13px; line-height: 1; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 22px; }
+
+  .lightbox { align-items: center; padding: 30px; }
+  .lightbox img { max-width: 92vw; max-height: 88vh; border-radius: 10px; box-shadow: 0 24px 60px -20px rgba(0,0,0,.6); }
+  .lightbox .close-lb {
+    position: absolute; top: 20px; right: 24px;
+    font-size: 30px; color: #fff; cursor: pointer; background: none; border: none;
+    padding: 4px; width: auto;
+  }
+  .lightbox .close-lb:hover { color: var(--accent); background: none; border: none; }
+
+  .empty-state {
+    text-align: center;
+    padding: 70px 20px;
+    color: var(--ink-faint);
+    border: 1.5px dashed var(--line);
+    border-radius: var(--radius);
+    background: color-mix(in srgb, var(--panel) 50%, transparent);
+  }
+  .empty-state .mark { font-family: var(--display); font-size: 38px; font-weight: 700; color: var(--line); margin-bottom: 12px; letter-spacing: -0.03em; }
+  .empty-state .big { font-family: var(--display); font-size: 17px; font-weight: 500; color: var(--ink-dim); margin-bottom: 6px; }
+  .empty-state div:last-child { font-size: 13px; }
+
+  .hint {
+    font-size: 12.5px;
+    color: var(--ink-dim);
+    border-left: 2px solid var(--accent);
+    padding: 3px 0 3px 15px;
+    margin-bottom: 24px;
+    line-height: 1.65;
+    max-width: 700px;
+  }
+  .hint b { color: var(--ink); font-weight: 600; }
+  .toast {
+    position: fixed;
+    bottom: 26px; left: 50%;
+    transform: translateX(-50%) translateY(80px);
+    background: var(--ink);
+    color: var(--bg);
+    padding: 12px 22px;
+    border-radius: var(--radius-sm);
+    font-size: 13px;
+    font-weight: 500;
+    opacity: 0;
+    transition: transform .3s cubic-bezier(.2,.9,.3,1.1), opacity .3s;
+    z-index: 200;
+    box-shadow: var(--shadow-lift);
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+
+  @media (max-width: 640px) {
+    .wrap { padding: 22px 18px 80px; }
+    .item-head { flex-wrap: wrap; gap: 12px; padding-left: 18px; }
+    .status-select { margin-left: auto; }
+    .item-body { padding-left: 18px; }
+    .head-actions { width: 100%; }
+    .form-row { flex-direction: column; gap: 0; }
+    .stats { gap: 8px; }
+    .stat { flex: 1; min-width: 0; }
+  }
+</style>
+</head>
+<body>
+<header>
+  <div class="head-row">
+    <div class="brand">
+      <div class="mark">F</div>
+      <div class="brand-text">
+        <h1 id="projectTitle">Website Feedback Tracker</h1>
+        <span class="tag" id="lastSaved">local</span>
+      </div>
+    </div>
+    <div class="head-actions">
+      <button class="ghost" id="themeBtn" title="Toggle light / dark" aria-label="Toggle theme"><span id="themeIcon">&#9789;</span></button>
+      <span class="vr"></span>
+      <button class="ghost" id="renameBtn">Rename</button>
+      <button class="ghost" id="importBtn">Import</button>
+      <button class="ghost" id="exportBtn">Export</button>
+      <button class="primary" id="addBtn">+ Add update</button>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="hint" id="hint">
+    <b>How this works —</b> Everything saves to this browser automatically. To share with your developer, click <b>Export .json</b> and commit that file to your GitHub repo (or send it over). Your developer opens this same page, clicks <b>Import</b>, updates statuses and notes, then exports and sends the file back. The <b>.json</b> file is the single source of truth.
+  </div>
+
+  <div class="stats" id="stats"></div>
+
+  <div class="toolbar">
+    <input type="text" class="search" id="search" placeholder="Search updates, pages, notes…">
+    <select class="filter" id="pageFilter"><option value="">All pages</option></select>
+    <select class="filter" id="sortBy">
+      <option value="num">Sort: Newest first</option>
+      <option value="num-asc">Sort: Oldest first</option>
+      <option value="priority">Sort: Priority</option>
+      <option value="status">Sort: Status</option>
+    </select>
+  </div>
+
+  <div class="items" id="items"></div>
+</div>
+
+<!-- Add/Edit Modal -->
+<div class="overlay" id="modal">
+  <div class="modal">
+    <h2 id="modalTitle">Add update</h2>
+    <div class="sub">Describe what needs to change and attach any screenshots.</div>
+    <div class="form-group">
+      <label>Title / summary</label>
+      <input type="text" id="fTitle" placeholder="e.g. Header logo is too small on mobile">
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Page / section</label>
+        <input type="text" id="fPage" list="pageList" placeholder="e.g. Homepage">
+        <datalist id="pageList"></datalist>
+      </div>
+      <div class="form-group">
+        <label>Priority</label>
+        <select id="fPriority">
+          <option value="high">High</option>
+          <option value="med" selected>Medium</option>
+          <option value="low">Low</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Description / comments</label>
+      <textarea id="fDesc" placeholder="What's wrong, what you'd like instead, any context…"></textarea>
+    </div>
+    <div class="form-group">
+      <label>Screenshots</label>
+      <div class="drop" id="drop">Click to choose images, or drag &amp; drop / paste here</div>
+      <input type="file" id="fileInput" accept="image/*" multiple hidden>
+      <div class="thumbs" id="thumbs"></div>
+    </div>
+    <div class="form-group">
+      <label>Developer status note (optional)</label>
+      <textarea id="fDevNote" placeholder="Developer confirms / responds here…"></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="ghost" id="cancelBtn">Cancel</button>
+      <button class="primary" id="saveBtn">Save update</button>
+    </div>
+  </div>
+</div>
+
+<!-- Lightbox -->
+<div class="overlay lightbox" id="lightbox">
+  <button class="close-lb" id="closeLb">&times;</button>
+  <img id="lbImg" src="" alt="">
+</div>
+
+<input type="file" id="importInput" accept="application/json" hidden>
+<div class="toast" id="toast"></div>
+
+<script>
+(function () {
+  "use strict";
+  const KEY = "wft_data_v1";
+  const STATUS = {
+    open:     { label: "Open",         cls: "open" },
+    progress: { label: "In Progress",  cls: "progress" },
+    done:     { label: "Done",         cls: "done" },
+    wontfix:  { label: "Won't Fix",    cls: "wontfix" }
+  };
+  const PRIORITY = { high: "High", med: "Medium", low: "Low" };
+  const PRI_RANK = { high: 0, med: 1, low: 2 };
+  const STATUS_RANK = { open: 0, progress: 1, done: 2, wontfix: 3 };
+
+  const THEME_KEY = "wft_theme";
+  let data = load();
+  let editingId = null;
+  let pendingShots = [];
+  let filterStatus = "";
+
+  const $ = (id) => document.getElementById(id);
+
+  function initTheme() {
+    let t = localStorage.getItem(THEME_KEY);
+    if (t !== "light" && t !== "dark") {
+      t = window.matchMedia && window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
+    }
+    applyTheme(t);
+  }
+  function applyTheme(t) {
+    document.documentElement.setAttribute("data-theme", t);
+    $("themeIcon").textContent = t === "dark" ? "\u263D" : "\u2600";
+    $("themeBtn").title = t === "dark" ? "Switch to light mode" : "Switch to dark mode";
+  }
+  function toggleTheme() {
+    const cur = document.documentElement.getAttribute("data-theme");
+    const next = cur === "dark" ? "light" : "dark";
+    localStorage.setItem(THEME_KEY, next);
+    applyTheme(next);
+  }
+
+  function load() {
+    try {
+      const raw = localStorage.getItem(KEY);
+      if (raw) return JSON.parse(raw);
+    } catch (e) {}
+    return { project: "Website Feedback Tracker", nextNum: 1, items: [] };
+  }
+  function save() {
+    try {
+      localStorage.setItem(KEY, JSON.stringify(data));
+      $("lastSaved").textContent = "saved " + new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
+    } catch (e) {
+      toast("Storage full — export your data as a file", true);
+    }
+  }
+  function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 7); }
+
+  function toast(msg) {
+    const t = $("toast");
+    t.textContent = msg;
+    t.classList.add("show");
+    clearTimeout(t._t);
+    t._t = setTimeout(() => t.classList.remove("show"), 2400);
+  }
+
+  /* ---------- Rendering ---------- */
+  function render() {
+    $("projectTitle").textContent = data.project;
+    renderStats();
+    renderPageFilter();
+    renderItems();
+  }
+
+  function renderStats() {
+    const counts = { all: data.items.length, open: 0, progress: 0, done: 0, wontfix: 0 };
+    data.items.forEach(i => counts[i.status]++);
+    const defs = [
+      ["", "all", "Total"],
+      ["open", "open", "Open"],
+      ["progress", "progress", "In Progress"],
+      ["done", "done", "Done"],
+      ["wontfix", "wontfix", "Won't Fix"]
+    ];
+    $("stats").innerHTML = defs.map(([val, dot, lbl]) =>
+      `<div class="stat ${filterStatus === val ? "active" : ""}" data-status="${val}" data-k="${dot}">
+        <span class="n">${counts[dot]}</span>
+        <span class="lbl"><span class="dot"></span>${lbl}</span>
+      </div>`).join("");
+    document.querySelectorAll(".stat").forEach(el => {
+      el.onclick = () => { filterStatus = el.dataset.status; render(); };
+    });
+  }
+
+  function renderPageFilter() {
+    const pages = [...new Set(data.items.map(i => i.page).filter(Boolean))].sort();
+    const cur = $("pageFilter").value;
+    $("pageFilter").innerHTML = '<option value="">All pages</option>' +
+      pages.map(p => `<option value="${esc(p)}">${esc(p)}</option>`).join("");
+    $("pageFilter").value = cur;
+    $("pageList").innerHTML = pages.map(p => `<option value="${esc(p)}">`).join("");
+  }
+
+  function renderItems() {
+    const q = $("search").value.trim().toLowerCase();
+    const pageF = $("pageFilter").value;
+    const sort = $("sortBy").value;
+
+    let list = data.items.slice();
+    if (filterStatus) list = list.filter(i => i.status === filterStatus);
+    if (pageF) list = list.filter(i => i.page === pageF);
+    if (q) list = list.filter(i =>
+      (i.title + " " + i.desc + " " + i.page + " " + (i.devNote||"")).toLowerCase().includes(q));
+
+    list.sort((a, b) => {
+      if (sort === "num") return b.num - a.num;
+      if (sort === "num-asc") return a.num - b.num;
+      if (sort === "priority") return PRI_RANK[a.priority] - PRI_RANK[b.priority] || b.num - a.num;
+      if (sort === "status") return STATUS_RANK[a.status] - STATUS_RANK[b.status] || b.num - a.num;
+      return b.num - a.num;
+    });
+
+    const el = $("items");
+    if (!list.length) {
+      el.innerHTML = `<div class="empty-state">
+        <div class="mark">/</div>
+        <div class="big">${data.items.length ? "No updates match your filters." : "No updates yet."}</div>
+        <div>${data.items.length ? "Try clearing search or filters." : "Click \u201C+ Add update\u201D to log your first comment."}</div>
+      </div>`;
+      return;
+    }
+
+    el.innerHTML = list.map(i => {
+      const s = STATUS[i.status];
+      const shots = (i.shots || []);
+      return `<div class="item" data-status="${i.status}" data-id="${i.id}">
+        <div class="item-head" data-toggle>
+          <div class="item-num"><span class="hash">#</span>${String(i.num).padStart(2,"0")}</div>
+          <div class="item-main">
+            <div class="item-title">${esc(i.title)}</div>
+            <div class="item-meta">
+              ${i.page ? `<span class="pill page">${esc(i.page)}</span>` : ""}
+              <span class="pill pri-${i.priority}">${PRIORITY[i.priority]}</span>
+              ${shots.length ? `<span class="has-img">\u25A3 ${shots.length}</span>` : ""}
+              <span class="meta-date">${fmtDate(i.created)}</span>
+            </div>
+          </div>
+          <select class="status-select ${s.cls}" data-statuschange>
+            ${Object.entries(STATUS).map(([k, v]) =>
+              `<option value="${k}" ${k === i.status ? "selected" : ""}>${v.label}</option>`).join("")}
+          </select>
+        </div>
+        <div class="item-body">
+          <div class="field-label">Description</div>
+          <div class="desc-text">${i.desc ? esc(i.desc) : "<span style='color:var(--ink-faint)'>No description.</span>"}</div>
+          ${shots.length ? `<div class="field-label">Screenshots</div><div class="shots">${
+            shots.map((src, idx) => `<img src="${src}" data-lb="${i.id}:${idx}" alt="screenshot">`).join("")
+          }</div>` : ""}
+          <div class="field-label">Developer status note</div>
+          <div class="dev-note ${i.devNote ? "" : "empty"}">${i.devNote ? esc(i.devNote) : "No note yet — developer can add a response here."}</div>
+          <div class="item-controls">
+            <button class="ghost" data-edit>Edit</button>
+            <button class="ghost danger" data-delete>Delete</button>
+          </div>
+        </div>
+      </div>`;
+    }).join("");
+
+    // wire events
+    el.querySelectorAll(".item").forEach(node => {
+      const id = node.dataset.id;
+      node.querySelector("[data-toggle]").addEventListener("click", (e) => {
+        if (e.target.closest("[data-statuschange]")) return;
+        node.classList.toggle("expanded");
+      });
+      node.querySelector("[data-statuschange]").addEventListener("change", (e) => {
+        const it = data.items.find(x => x.id === id);
+        it.status = e.target.value;
+        save(); render();
+      });
+      const editB = node.querySelector("[data-edit]");
+      if (editB) editB.addEventListener("click", () => openModal(id));
+      const delB = node.querySelector("[data-delete]");
+      if (delB) delB.addEventListener("click", () => {
+        if (confirm("Delete update #" + data.items.find(x=>x.id===id).num + "?")) {
+          data.items = data.items.filter(x => x.id !== id);
+          save(); render();
+        }
+      });
+      node.querySelectorAll("[data-lb]").forEach(img => {
+        img.addEventListener("click", () => {
+          const [iid, idx] = img.dataset.lb.split(":");
+          const it = data.items.find(x => x.id === iid);
+          $("lbImg").src = it.shots[+idx];
+          $("lightbox").classList.add("show");
+        });
+      });
+    });
+  }
+
+  /* ---------- Modal ---------- */
+  function openModal(id) {
+    editingId = id || null;
+    pendingShots = [];
+    if (id) {
+      const it = data.items.find(x => x.id === id);
+      $("modalTitle").textContent = "Edit update #" + it.num;
+      $("fTitle").value = it.title;
+      $("fPage").value = it.page || "";
+      $("fPriority").value = it.priority;
+      $("fDesc").value = it.desc || "";
+      $("fDevNote").value = it.devNote || "";
+      pendingShots = (it.shots || []).slice();
+    } else {
+      $("modalTitle").textContent = "Add update";
+      $("fTitle").value = ""; $("fPage").value = ""; $("fPriority").value = "med";
+      $("fDesc").value = ""; $("fDevNote").value = "";
+    }
+    renderThumbs();
+    $("modal").classList.add("show");
+    $("fTitle").focus();
+  }
+  function closeModal() { $("modal").classList.remove("show"); editingId = null; pendingShots = []; }
+
+  function renderThumbs() {
+    $("thumbs").innerHTML = pendingShots.map((src, i) =>
+      `<div class="thumb"><img src="${src}" alt=""><button class="x" data-rm="${i}">&times;</button></div>`).join("");
+    $("thumbs").querySelectorAll("[data-rm]").forEach(b => {
+      b.onclick = () => { pendingShots.splice(+b.dataset.rm, 1); renderThumbs(); };
+    });
+  }
+
+  function addFiles(files) {
+    const imgs = [...files].filter(f => f.type.startsWith("image/"));
+    let remaining = imgs.length;
+    if (!remaining) return;
+    imgs.forEach(f => {
+      const r = new FileReader();
+      r.onload = () => {
+        compress(r.result, (out) => {
+          pendingShots.push(out);
+          if (--remaining === 0) renderThumbs();
+          else renderThumbs();
+        });
+      };
+      r.readAsDataURL(f);
+    });
+  }
+
+  // Downscale images so localStorage / export stays manageable
+  function compress(dataUrl, cb) {
+    const img = new Image();
+    img.onload = () => {
+      const max = 1400;
+      let { width, height } = img;
+      if (width > max || height > max) {
+        const scale = max / Math.max(width, height);
+        width = Math.round(width * scale);
+        height = Math.round(height * scale);
+      }
+      const c = document.createElement("canvas");
+      c.width = width; c.height = height;
+      c.getContext("2d").drawImage(img, 0, 0, width, height);
+      cb(c.toDataURL("image/jpeg", 0.82));
+    };
+    img.onerror = () => cb(dataUrl);
+    img.src = dataUrl;
+  }
+
+  function saveItem() {
+    const title = $("fTitle").value.trim();
+    if (!title) { toast("Add a title first"); $("fTitle").focus(); return; }
+    const payload = {
+      title,
+      page: $("fPage").value.trim(),
+      priority: $("fPriority").value,
+      desc: $("fDesc").value.trim(),
+      devNote: $("fDevNote").value.trim(),
+      shots: pendingShots.slice()
+    };
+    if (editingId) {
+      const it = data.items.find(x => x.id === editingId);
+      Object.assign(it, payload, { updated: Date.now() });
+    } else {
+      data.items.push(Object.assign({
+        id: uid(), num: data.nextNum++, status: "open", created: Date.now()
+      }, payload));
+    }
+    save(); render(); closeModal();
+    toast(editingId ? "Update saved" : "Update added");
+  }
+
+  /* ---------- Import / Export ---------- */
+  function exportData() {
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    const stamp = new Date().toISOString().slice(0, 10);
+    a.href = url;
+    a.download = "feedback-tracker-" + stamp + ".json";
+    a.click();
+    URL.revokeObjectURL(url);
+    toast("Exported — commit this file to GitHub");
+  }
+  function importData(file) {
+    const r = new FileReader();
+    r.onload = () => {
+      try {
+        const parsed = JSON.parse(r.result);
+        if (!parsed.items || !Array.isArray(parsed.items)) throw new Error("bad");
+        if (data.items.length && !confirm("Replace all current data with the imported file?")) return;
+        data = parsed;
+        if (!data.nextNum) data.nextNum = Math.max(0, ...data.items.map(i => i.num || 0)) + 1;
+        save(); render();
+        toast("Imported " + data.items.length + " updates");
+      } catch (e) { toast("Couldn't read that file"); }
+    };
+    r.readAsText(file);
+  }
+
+  /* ---------- Helpers ---------- */
+  function esc(s) {
+    return String(s == null ? "" : s)
+      .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+  }
+  function fmtDate(ts) {
+    if (!ts) return "";
+    const d = new Date(ts);
+    return d.toLocaleDateString([], { month: "short", day: "numeric" });
+  }
+
+  /* ---------- Wire up ---------- */
+  $("themeBtn").onclick = toggleTheme;
+  $("addBtn").onclick = () => openModal(null);
+  $("cancelBtn").onclick = closeModal;
+  $("saveBtn").onclick = saveItem;
+  $("modal").addEventListener("click", (e) => { if (e.target === $("modal")) closeModal(); });
+
+  $("search").addEventListener("input", renderItems);
+  $("pageFilter").addEventListener("change", renderItems);
+  $("sortBy").addEventListener("change", renderItems);
+
+  $("exportBtn").onclick = exportData;
+  $("importBtn").onclick = () => $("importInput").click();
+  $("importInput").addEventListener("change", (e) => { if (e.target.files[0]) importData(e.target.files[0]); e.target.value=""; });
+
+  $("renameBtn").onclick = () => {
+    const name = prompt("Project name:", data.project);
+    if (name && name.trim()) { data.project = name.trim(); save(); render(); }
+  };
+
+  // File input / drop / paste
+  $("drop").onclick = () => $("fileInput").click();
+  $("fileInput").addEventListener("change", (e) => { addFiles(e.target.files); e.target.value=""; });
+  const drop = $("drop");
+  ["dragover","dragenter"].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.add("drag"); }));
+  ["dragleave","drop"].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.remove("drag"); }));
+  drop.addEventListener("drop", e => { if (e.dataTransfer.files.length) addFiles(e.dataTransfer.files); });
+  document.addEventListener("paste", (e) => {
+    if (!$("modal").classList.contains("show")) return;
+    const items = e.clipboardData && e.clipboardData.items;
+    if (!items) return;
+    const files = [...items].filter(i => i.type.startsWith("image/")).map(i => i.getAsFile());
+    if (files.length) addFiles(files);
+  });
+
+  // Lightbox
+  $("closeLb").onclick = () => $("lightbox").classList.remove("show");
+  $("lightbox").addEventListener("click", (e) => { if (e.target === $("lightbox")) $("lightbox").classList.remove("show"); });
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") { closeModal(); $("lightbox").classList.remove("show"); }
+  });
+
+  initTheme();
+  render();
+})();
+</script>
+</body>
+</html>
