@@ -224,6 +224,45 @@
   .stat[data-k="done"]     { --dot-c: var(--done); }
   .stat[data-k="wontfix"]  { --dot-c: var(--wontfix); }
 
+  /* ---- Quick Add ---- */
+  .quickadd {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 12px 14px;
+    margin-bottom: 16px;
+    transition: border-color .16s, box-shadow .16s;
+  }
+  .quickadd.drag { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow); }
+  .qa-row { display: flex; align-items: center; gap: 10px; }
+  .qa-plus {
+    font-family: var(--display); font-size: 20px; font-weight: 600; color: var(--accent);
+    width: 24px; text-align: center; flex-shrink: 0; line-height: 1;
+  }
+  #qaInput {
+    flex: 1; min-width: 0;
+    background: transparent; border: none;
+    color: var(--ink); font-size: 15px; font-family: var(--sans);
+    padding: 6px 2px;
+  }
+  #qaInput::placeholder { color: var(--ink-faint); }
+  #qaInput:focus { outline: none; }
+  .qa-pri {
+    background: var(--panel-2); border: 1px solid var(--line); border-radius: var(--radius-sm);
+    padding: 7px 9px; color: var(--ink-dim); font-size: 12px; font-family: var(--sans); cursor: pointer; flex-shrink: 0;
+  }
+  .qa-pri:focus { outline: none; border-color: var(--accent); }
+  #qaAddBtn { flex-shrink: 0; padding: 8px 16px; }
+  .qa-hint { font-size: 11.5px; color: var(--ink-faint); margin-top: 8px; padding-left: 34px; line-height: 1.5; }
+  .qa-hint b { color: var(--ink-dim); font-weight: 600; }
+  .item.flash { animation: flashNew .9s ease; }
+  @keyframes flashNew {
+    0% { box-shadow: 0 0 0 3px var(--accent-glow), var(--shadow); }
+    100% { box-shadow: var(--shadow); }
+  }
+  .item.paste-target { border-color: var(--accent) !important; box-shadow: 0 0 0 2px var(--accent-glow), var(--shadow) !important; }
+
   .toolbar {
     display: flex;
     gap: 10px;
@@ -717,6 +756,20 @@
 
     <div class="stats" id="stats"></div>
 
+    <div class="quickadd" id="quickadd">
+      <div class="qa-row">
+        <span class="qa-plus">+</span>
+        <input type="text" id="qaInput" placeholder="Type an item and press Enter to add it…" autocomplete="off">
+        <select class="qa-pri" id="qaPriority" title="Priority for this item">
+          <option value="high">High</option>
+          <option value="med" selected>Medium</option>
+          <option value="low">Low</option>
+        </select>
+        <button class="primary" id="qaAddBtn">Add</button>
+      </div>
+      <div class="qa-hint">Press <b>Enter</b> to add. Paste an image here (or on any item below) to attach a screenshot. Click an item to expand and edit details.</div>
+    </div>
+
     <div class="toolbar" id="toolbar">
       <select class="filter" id="pageFilter"><option value="">All pages</option></select>
       <select class="filter" id="sortBy">
@@ -852,6 +905,7 @@
   let homeSearch = "";
   let currentUser = localStorage.getItem(USER_KEY) || "";
   let dirty = false;         // are there local edits not yet published?
+  let hoverItemId = null;    // item currently under the cursor (for paste-to-item)
 
   const $ = (id) => document.getElementById(id);
 
@@ -1315,6 +1369,15 @@
     // wire events
     el.querySelectorAll(".item").forEach(node => {
       const id = node.dataset.id;
+      node.addEventListener("mouseenter", () => { hoverItemId = id; });
+      node.addEventListener("mouseleave", () => { if (hoverItemId === id) hoverItemId = null; });
+      // drag-drop images directly onto an item
+      node.addEventListener("dragover", (e) => { e.preventDefault(); node.classList.add("paste-target"); });
+      node.addEventListener("dragleave", () => node.classList.remove("paste-target"));
+      node.addEventListener("drop", (e) => {
+        e.preventDefault(); node.classList.remove("paste-target");
+        if (e.dataTransfer.files.length) attachImagesToItem(id, e.dataTransfer.files);
+      });
       node.querySelector("[data-toggle]").addEventListener("click", (e) => {
         if (e.target.closest("[data-statuschange]")) return;
         node.classList.toggle("expanded");
@@ -1445,6 +1508,57 @@
     toast(editingId ? "Update saved" : "Update added");
   }
 
+  // ---- Quick Add: create an item from just a title, no modal ----
+  let lastCreatedId = null;
+  function quickAdd() {
+    if (!data) return;
+    const title = $("qaInput").value.trim();
+    if (!title) { $("qaInput").focus(); return; }
+    const item = {
+      id: uid(), num: data.nextNum++, status: "open", created: Date.now(),
+      author: currentUser || "",
+      title, page: "", priority: $("qaPriority").value, desc: "", devNote: "", shots: []
+    };
+    data.items.push(item);
+    lastCreatedId = item.id;
+    save();
+    $("qaInput").value = "";
+    // Make sure new item is visible: clear filters that could hide it
+    if (filterStatus && filterStatus !== "open") filterStatus = "";
+    render();
+    // flash the new row
+    const node = document.querySelector(`.item[data-id="${item.id}"]`);
+    if (node) { node.classList.add("flash"); }
+    $("qaInput").focus();
+  }
+
+  // Attach pasted/dropped images to a specific existing item
+  function attachImagesToItem(itemId, files) {
+    const it = data.items.find(x => x.id === itemId);
+    if (!it) return;
+    const imgs = [...files].filter(f => f.type.startsWith("image/"));
+    if (!imgs.length) return;
+    if (!Array.isArray(it.shots)) it.shots = [];
+    let remaining = imgs.length;
+    imgs.forEach(f => {
+      const r = new FileReader();
+      r.onload = () => {
+        compress(r.result, (out) => {
+          it.shots.push(out);
+          if (--remaining === 0) {
+            it.updated = Date.now();
+            save(); render();
+            toast(imgs.length + " image" + (imgs.length===1?"":"s") + " added to #" + String(it.num).padStart(2,"0"));
+            // keep the item expanded so they can see it
+            const node = document.querySelector(`.item[data-id="${it.id}"]`);
+            if (node) node.classList.add("expanded");
+          }
+        });
+      };
+      r.readAsDataURL(f);
+    });
+  }
+
   /* ---------- Import / Export (per project) ---------- */
   function slugify(s) {
     return String(s || "project").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 40) || "project";
@@ -1528,6 +1642,21 @@
   $("saveBtn").onclick = saveItem;
   $("modal").addEventListener("click", (e) => { if (e.target === $("modal")) closeModal(); });
 
+  // Quick Add: Enter to add, button to add
+  $("qaAddBtn").onclick = quickAdd;
+  $("qaInput").addEventListener("keydown", (e) => { if (e.key === "Enter") { e.preventDefault(); quickAdd(); } });
+  // Drag images onto the quick-add bar -> attach to most-recent item (create one if none)
+  const qa = $("quickadd");
+  ["dragover","dragenter"].forEach(ev => qa.addEventListener(ev, e => { e.preventDefault(); qa.classList.add("drag"); }));
+  ["dragleave","drop"].forEach(ev => qa.addEventListener(ev, e => { e.preventDefault(); qa.classList.remove("drag"); }));
+  qa.addEventListener("drop", (e) => {
+    if (!e.dataTransfer.files.length) return;
+    let target = lastCreatedId && data.items.find(x => x.id === lastCreatedId);
+    if (!target) target = data.items[data.items.length - 1];
+    if (target) attachImagesToItem(target.id, e.dataTransfer.files);
+    else toast("Add an item first, then drop the image on it");
+  });
+
   // Search box serves both views
   $("search").addEventListener("input", () => {
     if (data) renderItems();
@@ -1581,11 +1710,24 @@
   ["dragleave","drop"].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.remove("drag"); }));
   drop.addEventListener("drop", e => { if (e.dataTransfer.files.length) addFiles(e.dataTransfer.files); });
   document.addEventListener("paste", (e) => {
-    if (!$("modal").classList.contains("show")) return;
-    const items = e.clipboardData && e.clipboardData.items;
-    if (!items) return;
-    const files = [...items].filter(i => i.type.startsWith("image/")).map(i => i.getAsFile());
-    if (files.length) addFiles(files);
+    const clip = e.clipboardData && e.clipboardData.items;
+    if (!clip) return;
+    const files = [...clip].filter(i => i.type.startsWith("image/")).map(i => i.getAsFile());
+    if (!files.length) return;
+
+    // 1) Modal open -> add to the item being edited (existing behavior)
+    if ($("modal").classList.contains("show")) { addFiles(files); return; }
+
+    // 2) In a project view -> attach to the item under the cursor, else the most recent item
+    if (data) {
+      let targetId = hoverItemId;
+      if (!targetId) {
+        const t = (lastCreatedId && data.items.find(x => x.id === lastCreatedId)) || data.items[data.items.length - 1];
+        targetId = t && t.id;
+      }
+      if (targetId) { e.preventDefault(); attachImagesToItem(targetId, files); }
+      else toast("Add an item first, then paste the image onto it");
+    }
   });
 
   // Lightbox
