@@ -113,6 +113,7 @@
   .pri-low{color:var(--inkDim);} .pri-low::before{background:var(--inkFaint);}
   .metatag { font-family:var(--mono); font-size:11px; color:var(--inkFaint); }
   .metatag.img { color:var(--accent2); }
+  .metatag.reply { color:var(--progress); }
   .status-select { font-family:var(--mono); font-size:10.5px; font-weight:500; text-transform:uppercase; letter-spacing:.05em; border:none; border-radius:6px; padding:6px 9px; cursor:pointer; color:var(--onStatus); flex-shrink:0; }
   .status-select.open{background:var(--open);} .status-select.progress{background:var(--progress);}
   .status-select.done{background:var(--done);} .status-select.wontfix{background:var(--wontfix); color:#fff;}
@@ -132,13 +133,89 @@
   .rte.drag { border-color:var(--accent); box-shadow:0 0 0 3px var(--glow); }
   .rte p { margin:0 0 10px; } .rte p:last-child { margin-bottom:0; }
   .rte img { max-width:100%; border-radius:var(--radius-sm); border:1px solid var(--line); margin:6px 0; cursor:zoom-in; display:block; }
+  /* Auto-numbered images: counter resets per editable area, so numbers are always correct */
+  .rte { counter-reset: figno; }
+  .rte figure { margin:10px 0; padding:0 0 0 12px; border-left:2px solid var(--lineSoft); position:relative; counter-increment: figno; }
+  .rte figure img { margin:6px 0 0; }
+  .rte figcaption { font-size:13px; color:var(--inkDim); font-style:italic; outline:none; min-height:1.2em; padding:2px 0 2px 30px; position:relative; }
+  .rte figcaption::before {
+    content:"[" counter(figno) "]";
+    position:absolute; left:0; top:2px;
+    font-family:var(--mono); font-style:normal; font-size:10px; font-weight:600;
+    color:#fff; background:var(--accent2);
+    border-radius:4px; padding:1px 5px; line-height:1.4;
+  }
+  .rte figcaption:empty::before { content:"[" counter(figno) "]"; }  /* keep the tag even with no caption text */
+  .rte figcaption:empty::after { content:attr(data-ph); color:var(--inkFaint); font-style:italic; }
+  .rte figcaption:focus { color:var(--ink); }
+  /* Reference chip used inside prose, e.g. "see [2]" */
+  .rte .imgref, .comment-body .imgref {
+    font-family:var(--mono); font-size:11px; font-weight:600;
+    background:color-mix(in srgb, var(--accent2) 15%, transparent); color:var(--accent2);
+    border:1px solid color-mix(in srgb, var(--accent2) 35%, transparent);
+    border-radius:4px; padding:0 4px; margin:0 1px; white-space:nowrap;
+  }
+  .refbtn { position:absolute; right:6px; top:6px; z-index:2; font-family:var(--mono); font-size:9px; padding:2px 6px;
+    background:color-mix(in srgb,var(--panel) 90%,transparent); border:1px solid var(--line); color:var(--inkDim);
+    border-radius:4px; cursor:pointer; opacity:0; transition:opacity .15s; }
+  .rte figure:hover .refbtn { opacity:1; }
+  .refbtn:hover { border-color:var(--accent2); color:var(--accent2); background:var(--panel); }
   .rte:empty::before { content:attr(data-ph); color:var(--inkFaint); }
   .rte-hint { font-size:11px; color:var(--inkFaint); margin-top:7px; }
   .rte-hint b { color:var(--inkDim); }
+
+  /* ---- Responses thread ---- */
+  .thread { margin-top:22px; }
+  .tcount { font-family:var(--mono); font-size:9px; background:var(--accent); color:#fff; border-radius:9px; padding:1px 6px; margin-left:2px; }
+  .comments { display:flex; flex-direction:column; gap:9px; margin-bottom:14px; }
+  .no-comments { font-size:12.5px; color:var(--inkFaint); font-style:italic; padding:2px 0 6px; }
+  .comment { position:relative; border:1px solid var(--line); border-radius:var(--radius-sm); padding:10px 12px 10px 15px; overflow:hidden; }
+  .comment.mine { margin-left:26px; } /* your own responses indent slightly, like a chat */
+  .comment-bar { position:absolute; left:0; top:0; bottom:0; width:3px; }
+  .comment-head { display:flex; align-items:center; gap:8px; margin-bottom:6px; }
+  .avatar { width:22px; height:22px; border-radius:50%; color:#fff; display:inline-flex; align-items:center; justify-content:center; font-family:var(--display); font-weight:600; font-size:10px; flex-shrink:0; }
+  .avatar.sm { width:20px; height:20px; font-size:9px; }
+  .comment-name { font-weight:600; font-size:13px; color:var(--ink); }
+  .comment-time { font-family:var(--mono); font-size:10px; color:var(--inkFaint); }
+  .cdel { margin-left:auto; background:transparent; border:none; color:var(--inkFaint); font-size:16px; line-height:1; padding:2px 6px; cursor:pointer; border-radius:4px; }
+  .cdel:hover { color:var(--danger); background:transparent; border:none; }
+  .comment-body { font-size:14px; color:var(--ink); line-height:1.6; counter-reset: figno; }
+  .comment-body p { margin:0 0 8px; } .comment-body p:last-child { margin-bottom:0; }
+  .comment-body img { max-width:100%; border-radius:var(--radius-sm); border:1px solid var(--line); margin:5px 0; cursor:zoom-in; display:block; }
+  .comment-body figure { margin:8px 0; padding:0 0 0 10px; border-left:2px solid var(--lineSoft); counter-increment: figno; }
+  .comment-body figcaption { font-size:12.5px; color:var(--inkDim); font-style:italic; padding:2px 0 2px 28px; position:relative; }
+  .comment-body figcaption::before { content:"[" counter(figno) "]"; position:absolute; left:0; top:2px; font-family:var(--mono); font-style:normal; font-size:9.5px; font-weight:600; color:#fff; background:var(--accent2); border-radius:4px; padding:1px 5px; line-height:1.4; }
+  .comment-body figcaption:empty::after { content:attr(data-ph); color:var(--inkFaint); }
+
+  .compose { border:1px dashed var(--line); border-radius:var(--radius-sm); padding:11px 12px; background:var(--panel2); }
+  .compose-who { display:flex; align-items:center; gap:8px; margin-bottom:8px; }
+  .compose-name { font-size:13px; font-weight:600; color:var(--ink); }
+  .crte { min-height:44px; background:var(--field); font-size:14px; }
+  .compose-actions { display:flex; justify-content:flex-end; margin-top:9px; }
+
   .item-controls { display:flex; gap:8px; margin-top:16px; flex-wrap:wrap; }
 
   .overlay { position:fixed; inset:0; background:color-mix(in srgb,var(--bg) 30%,rgba(4,8,12,.7)); backdrop-filter:blur(4px); display:none; align-items:center; justify-content:center; z-index:100; padding:30px; }
   .overlay.show { display:flex; }
+
+  /* modal (team) */
+  .modal { background:var(--panel); border:1px solid var(--line); border-radius:16px; width:100%; max-width:480px; padding:28px 30px 24px; box-shadow:var(--shadowLift); max-height:86vh; overflow-y:auto; }
+  .modal h2 { font-family:var(--display); font-size:21px; font-weight:600; letter-spacing:-.02em; margin-bottom:5px; }
+  .modal .msub { font-size:13px; color:var(--inkDim); margin-bottom:20px; line-height:1.55; }
+  .fg { margin-bottom:16px; }
+  .fg>label { display:block; font-family:var(--mono); font-size:9.5px; text-transform:uppercase; letter-spacing:.1em; color:var(--inkDim); margin-bottom:7px; }
+  .fg input[type=text] { width:100%; background:var(--field); border:1px solid var(--line); border-radius:var(--radius-sm); padding:10px 12px; color:var(--ink); font-size:14px; font-family:var(--sans); }
+  .fg input:focus { outline:none; border-color:var(--accent); box-shadow:0 0 0 3px var(--glow); }
+  .macts { display:flex; gap:10px; justify-content:flex-end; margin-top:20px; }
+  .team-list { display:flex; flex-direction:column; gap:7px; margin-top:6px; }
+  .team-row { display:flex; align-items:center; gap:10px; padding:9px 11px; border:1px solid var(--line); border-radius:var(--radius-sm); background:var(--panel2); font-size:14px; }
+  .team-row .tname { font-weight:500; }
+  .team-row .you { font-family:var(--mono); font-size:9px; background:var(--accent); color:#fff; border-radius:8px; padding:1px 6px; }
+  .team-row .rm { margin-left:auto; }
+  .team-row .rm button { padding:4px 9px; font-size:11.5px; color:var(--inkDim); }
+  .team-row .rm button:hover { color:var(--danger); border-color:var(--danger); }
+  .team-empty { font-size:13px; color:var(--inkFaint); font-style:italic; padding:6px 0; }
+  #userSelect { cursor:pointer; }
   .lightbox img { max-width:92vw; max-height:88vh; border-radius:10px; box-shadow:0 24px 60px -20px rgba(0,0,0,.6); }
   .lightbox .close { position:absolute; top:20px; right:24px; font-size:30px; color:#fff; background:none; border:none; cursor:pointer; }
 
@@ -188,7 +265,27 @@
     <span class="fname" id="fileName">— not linked —</span>
     <span class="grow"></span>
     <span class="fb-label">You are</span>
-    <input class="userinp" id="userInput" placeholder="Your name" autocomplete="off">
+    <span class="avatar" id="meAvatar" style="display:none"></span>
+    <select class="userinp" id="userSelect"></select>
+    <button class="ghost sm" id="teamBtn" title="Manage team">Team</button>
+  </div>
+
+  <!-- Team manager -->
+  <div class="overlay" id="teamModal">
+    <div class="modal">
+      <h2>Team</h2>
+      <div class="msub">Add everyone who works on this list. Names are saved in your data file, so your teammates see the same roster. Each person gets their own colour on items and responses.</div>
+      <div class="fg">
+        <label>Add a team member</label>
+        <div style="display:flex; gap:8px">
+          <input type="text" id="newTeamName" placeholder="e.g. Priya (Developer)" autocomplete="off">
+          <button class="primary" id="addTeamBtn" style="flex-shrink:0">Add</button>
+        </div>
+      </div>
+      <div class="flabel" style="margin-top:4px">Current team</div>
+      <div id="teamList" class="team-list"></div>
+      <div class="macts"><button class="ghost" id="teamCloseBtn">Done</button></div>
+    </div>
   </div>
 
   <div class="stats" id="stats"></div>
@@ -253,10 +350,12 @@ window.SEED = {"project": "Shvaan Stay-N-Play", "nextNum": 18, "items": [{"id": 
   }
   function normalize(d){
     d.project=d.project||"Shvaan Stay-N-Play";
+    if(!Array.isArray(d.team)) d.team=[];
     d.items=(d.items||[]).map(function(it){
       return {id:it.id||uid(),num:it.num||0,title:it.title||"Untitled",priority:it.priority||"med",
         status:it.status||"open",body:(it.body!=null?it.body:(it.desc?("<p>"+escapeHtml(it.desc)+"</p>"):"<p></p>")),
-        author:it.author||"",created:it.created||Date.now()};
+        author:it.author||"",created:it.created||Date.now(),
+        comments:Array.isArray(it.comments)?it.comments:[]};
     });
     if(!d.nextNum) d.nextNum=d.items.reduce(function(m,i){return Math.max(m,i.num||0);},0)+1;
     return d;
@@ -341,7 +440,46 @@ window.SEED = {"project": "Shvaan Stay-N-Play", "nextNum": 18, "items": [{"id": 
 
   /* ---- render ---- */
   function render(){ renderStats(); renderItems(); renderUser(); renderState(); }
-  function renderUser(){ $("userInput").value=localStorage.getItem(USER_KEY)||""; }
+  function renderUser(){
+    var me=currentUserName(), team=db.team||[];
+    var sel=$("userSelect");
+    // If the saved name isn't on the roster (e.g. removed), fall back to unset
+    if(me && team.indexOf(me)<0){ me=""; localStorage.setItem(USER_KEY,""); }
+    var opts='<option value="">'+(team.length?"— pick your name —":"— add your team —")+'</option>';
+    opts+=team.map(function(n){ return '<option value="'+escapeHtml(n)+'" '+(n===me?"selected":"")+'>'+escapeHtml(n)+'</option>'; }).join("");
+    sel.innerHTML=opts;
+    var av=$("meAvatar");
+    if(me){ av.style.display=""; av.setAttribute("style",authorStyle(me)+";display:inline-flex"); av.textContent=initialsOf(me); }
+    else { av.style.display="none"; }
+  }
+
+  function addTeamMember(name){
+    name=(name||"").trim(); if(!name) return false;
+    if(!Array.isArray(db.team)) db.team=[];
+    if(db.team.some(function(n){return n.toLowerCase()===name.toLowerCase();})){ toast("Already on the team"); return false; }
+    db.team.push(name); markDirty(); return true;
+  }
+  function removeTeamMember(name){
+    db.team=(db.team||[]).filter(function(n){return n!==name;});
+    if(currentUserName()===name) localStorage.setItem(USER_KEY,"");
+    markDirty();
+  }
+  function renderTeamList(){
+    var el=$("teamList"), team=db.team||[], me=currentUserName();
+    if(!team.length){ el.innerHTML='<div class="team-empty">No one added yet. Add yourself and your developer above.</div>'; return; }
+    el.innerHTML=team.map(function(n){
+      return '<div class="team-row"><span class="avatar" style="'+authorStyle(n)+'">'+escapeHtml(initialsOf(n))+'</span>'
+        +'<span class="tname">'+escapeHtml(n)+'</span>'
+        +(n===me?'<span class="you">you</span>':'')
+        +'<span class="rm"><button class="ghost" data-rmteam="'+escapeHtml(n)+'">Remove</button></span></div>';
+    }).join("");
+    Array.prototype.forEach.call(el.querySelectorAll("[data-rmteam]"),function(b){
+      b.addEventListener("click",function(){
+        var n=b.dataset.rmteam;
+        if(confirm('Remove "'+n+'" from the team? Their existing items and responses stay.')){ removeTeamMember(n); renderTeamList(); render(); }
+      });
+    });
+  }
   function renderState(){
     var dot=$("stateDot"), txt=$("stateText");
     dot.className="dotstate "+(dirty?"dirty":(fileHandle?"file":"saved"));
@@ -363,6 +501,38 @@ window.SEED = {"project": "Shvaan Stay-N-Play", "nextNum": 18, "items": [{"id": 
 
   function bodyImgCount(html){ var m=html&&html.match(/<img/gi); return m?m.length:0; }
   function bodyText(html){ var d=document.createElement("div"); d.innerHTML=html||""; return (d.textContent||"").trim(); }
+
+  /* ---- authorship: stable color per name ---- */
+  function currentUserName(){ return localStorage.getItem(USER_KEY)||""; }
+  function initialsOf(name){ name=(name||"").trim(); if(!name) return "?"; var p=name.split(/\s+/); return ((p[0][0]||"")+(p[1]?p[1][0]:"")).toUpperCase(); }
+  function hashStr(s){ var h=0; s=(s||"").toLowerCase(); for(var i=0;i<s.length;i++){ h=(h*31+s.charCodeAt(i))|0; } return Math.abs(h); }
+  // Palette of tint hues that read well in both themes
+  var AUTHOR_HUES=[210,160,275,20,330,120,45,300,190,255];
+  function authorHue(name){ if(!name) return 210; return AUTHOR_HUES[hashStr(name)%AUTHOR_HUES.length]; }
+  function authorStyle(name){ var h=authorHue(name); return "background:hsl("+h+",55%,45%);"; }
+  function commentTint(name){ var h=authorHue(name); return "border-color:hsl("+h+",55%,55%); background:color-mix(in srgb, hsl("+h+",60%,55%) 8%, var(--panel));"; }
+  function commentBar(name){ var h=authorHue(name); return "background:hsl("+h+",55%,50%);"; }
+  function fmtWhen(ts){ if(!ts) return ""; var d=new Date(ts); var now=new Date();
+    var sameDay=d.toDateString()===now.toDateString();
+    var t=d.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
+    return sameDay? ("today "+t) : (d.toLocaleDateString([], {month:'short',day:'numeric'})+" "+t); }
+
+  function renderComments(it){
+    var cs=it.comments||[];
+    if(!cs.length) return '<div class="no-comments">No responses yet. Add the first one below.</div>';
+    return cs.map(function(c){
+      var mine = c.author && currentUserName() && c.author===currentUserName();
+      return '<div class="comment '+(mine?"mine":"")+'" data-cid="'+c.id+'" style="'+commentTint(c.author)+'">'
+        +'<div class="comment-bar" style="'+commentBar(c.author)+'"></div>'
+        +'<div class="comment-main">'
+        +'<div class="comment-head"><span class="avatar sm" style="'+authorStyle(c.author)+'">'+escapeHtml(initialsOf(c.author))+'</span>'
+        +'<span class="comment-name">'+escapeHtml(c.author||"Unknown")+'</span>'
+        +'<span class="comment-time">'+fmtWhen(c.ts)+'</span>'
+        +'<button class="cdel" data-delc="'+c.id+'" title="Delete response">&times;</button></div>'
+        +'<div class="comment-body">'+upgradeBody(c.body||"")+'</div>'
+        +'</div></div>';
+    }).join("");
+  }
 
   function renderItems(){
     var q=$("search").value.trim().toLowerCase(), sort=$("sortBy").value;
@@ -386,6 +556,7 @@ window.SEED = {"project": "Shvaan Stay-N-Play", "nextNum": 18, "items": [{"id": 
         +'<div class="item-main"><div class="item-title">'+escapeHtml(i.title)+'</div>'
         +'<div class="item-meta"><span class="pri pri-'+i.priority+'">'+PRIORITY[i.priority]+'</span>'
         +(imgs?'<span class="metatag img">&#9635; '+imgs+'</span>':'')
+        +((i.comments&&i.comments.length)?'<span class="metatag reply">&#9993; '+i.comments.length+'</span>':'')
         +(i.author?'<span class="metatag">by '+escapeHtml(i.author)+'</span>':'')
         +'</div></div>'
         +'<select class="status-select '+s.cls+'" data-status-sel>'+Object.keys(STATUS).map(function(k){return '<option value="'+k+'" '+(k===i.status?"selected":"")+'>'+STATUS[k].label+'</option>';}).join("")+'</select>'
@@ -394,8 +565,17 @@ window.SEED = {"project": "Shvaan Stay-N-Play", "nextNum": 18, "items": [{"id": 
         +'<div class="flabel">Detail'
         +'<span class="ftools"><button class="ftbtn" data-retitle>Rename</button><button class="ftbtn" data-repri>Priority</button><button class="ftbtn" data-addimg>Insert image</button><button class="ftbtn" data-del style="color:var(--danger)">Delete</button></span>'
         +'</div>'
-        +'<div class="rte" contenteditable="true" data-rte data-ph="Type freely here. Describe the change, paste or drop screenshots inline, mix text and images in any order…">'+(i.body||"")+'</div>'
-        +'<div class="rte-hint">Type anywhere; <b>paste</b> or <b>drop</b> images right where your cursor is. Saves automatically as you go.</div>'
+        +'<div class="rte" contenteditable="true" data-rte data-ph="Type freely here. Describe the change, paste or drop screenshots inline, mix text and images in any order…">'+upgradeBody(i.body||"")+'</div>'
+        +'<div class="rte-hint">Type anywhere; <b>paste</b> or <b>drop</b> images right where your cursor is. Each image is auto-tagged <b>[1] [2] [3]</b> \u2014 write a note on its caption line, and click <b>ref</b> on an image to drop a reference like [2] into your text. Saves automatically.</div>'
+        +'<div class="thread">'
+        +'<div class="flabel">Responses'+((i.comments&&i.comments.length)?' <span class="tcount">'+i.comments.length+'</span>':'')+'</div>'
+        +'<div class="comments">'+renderComments(i)+'</div>'
+        +'<div class="compose">'
+        +'<div class="compose-who"><span class="avatar" style="'+authorStyle(currentUserName())+'">'+escapeHtml(initialsOf(currentUserName()))+'</span><span class="compose-name">'+(currentUserName()?escapeHtml(currentUserName()):'<span style="color:var(--inkFaint)">Pick your name above to reply</span>')+'</span></div>'
+        +'<div class="rte crte" contenteditable="true" data-crte data-ph="Write a response\u2026 paste or drop screenshots inline too."></div>'
+        +'<div class="compose-actions"><button class="primary sm" data-postcomment>Post response</button></div>'
+        +'</div>'
+        +'</div>'
         +'</div></div>';
     }).join("");
     wireItems();
@@ -409,28 +589,79 @@ window.SEED = {"project": "Shvaan Stay-N-Play", "nextNum": 18, "items": [{"id": 
       node.querySelector("[data-toggle]").addEventListener("click",function(e){ if(e.target.closest("[data-status-sel]"))return; node.classList.toggle("expanded"); });
       node.querySelector("[data-status-sel]").addEventListener("change",function(e){ var it=find(id); it.status=e.target.value; markDirty(); render(); });
 
-      var rte=node.querySelector("[data-rte]");
-      if(rte){
-        var commit=function(){ var it=find(id); if(it && it.body!==rte.innerHTML){ it.body=rte.innerHTML; markDirty(); } };
-        rte.addEventListener("input", debounce(commit,500));
-        rte.addEventListener("blur", commit);
-        // paste images inline
+      // Enable inline paste/drop/lightbox on any contenteditable RTE; onCommit called after changes
+      function enableRteImages(rte, onCommit){
+        if(!rte) return;
         rte.addEventListener("paste",function(e){
           var cd=e.clipboardData; if(!cd) return;
           var imgs=Array.prototype.slice.call(cd.items).filter(function(x){return x.type.indexOf("image/")===0;});
-          if(imgs.length){ e.preventDefault(); imgs.forEach(function(it){ var f=it.getAsFile(); readCompress(f,function(url){ insertImageAtCursor(rte,url); commit(); }); }); }
+          if(imgs.length){ e.preventDefault(); imgs.forEach(function(it){ var f=it.getAsFile(); readCompress(f,function(url){ insertImageAtCursor(rte,url); if(onCommit)onCommit(); }); }); }
         });
-        // drop images inline
         rte.addEventListener("dragover",function(e){ e.preventDefault(); rte.classList.add("drag"); });
         rte.addEventListener("dragleave",function(){ rte.classList.remove("drag"); });
         rte.addEventListener("drop",function(e){
           e.preventDefault(); rte.classList.remove("drag");
           var files=Array.prototype.slice.call(e.dataTransfer.files).filter(function(f){return f.type.indexOf("image/")===0;});
-          if(files.length){ files.forEach(function(f){ readCompress(f,function(url){ insertImageAtCursor(rte,url); commit(); }); }); }
+          if(files.length){ files.forEach(function(f){ readCompress(f,function(url){ insertImageAtCursor(rte,url); if(onCommit)onCommit(); }); }); }
         });
-        // click image -> lightbox
         rte.addEventListener("click",function(e){ if(e.target.tagName==="IMG"){ $("lbImg").src=e.target.src; $("lightbox").classList.add("show"); } });
       }
+
+      var rte=node.querySelector("[data-rte]");
+      if(rte){
+        addRefButtons(rte);
+        var lastRange=null;
+        rte.addEventListener("keyup",function(){ var s=window.getSelection(); if(s.rangeCount && rte.contains(s.anchorNode)) lastRange=s.getRangeAt(0).cloneRange(); });
+        rte.addEventListener("mouseup",function(){ var s=window.getSelection(); if(s.rangeCount && rte.contains(s.anchorNode)) lastRange=s.getRangeAt(0).cloneRange(); });
+
+        var commit=function(){ var it=find(id); var html=cleanBody(rte.innerHTML); if(it && it.body!==html){ it.body=html; markDirty(); } };
+        rte.addEventListener("input", debounce(commit,500));
+        rte.addEventListener("blur", commit);
+        enableRteImages(rte, function(){ addRefButtons(rte); commit(); });
+
+        // Click "ref" on a figure -> insert an [n] chip at your last cursor spot
+        rte.addEventListener("click",function(e){
+          var b=e.target.closest(".refbtn");
+          if(!b) return;
+          e.preventDefault(); e.stopPropagation();
+          var fig=b.closest("figure");
+          var n=figIndex(fig, rte);
+          insertRefChip(rte, n, lastRange);
+          commit();
+        });
+      }
+
+      // Compose box for a new response
+      var crte=node.querySelector("[data-crte]");
+      if(crte){
+        var cLastRange=null;
+        crte.addEventListener("keyup",function(){ var s=window.getSelection(); if(s.rangeCount && crte.contains(s.anchorNode)) cLastRange=s.getRangeAt(0).cloneRange(); });
+        crte.addEventListener("mouseup",function(){ var s=window.getSelection(); if(s.rangeCount && crte.contains(s.anchorNode)) cLastRange=s.getRangeAt(0).cloneRange(); });
+        enableRteImages(crte, function(){ addRefButtons(crte); });
+        crte.addEventListener("click",function(e){
+          var b=e.target.closest(".refbtn"); if(!b) return;
+          e.preventDefault(); e.stopPropagation();
+          insertRefChip(crte, figIndex(b.closest("figure"), crte), cLastRange);
+        });
+      }
+      var post=node.querySelector("[data-postcomment]");
+      if(post) post.addEventListener("click",function(){
+        var who=currentUserName();
+        if(!who){ toast("Pick your name in the bar above (or add it via Team)"); $("userSelect").focus(); return; }
+        var body=cleanBody(crte.innerHTML).trim();
+        if(!body || !bodyText(body) && crte.querySelectorAll("img").length===0){ toast("Write a response first"); crte.focus(); return; }
+        var it=find(id); if(!it.comments) it.comments=[];
+        it.comments.push({ id:uid(), author:who, ts:Date.now(), body:body });
+        markDirty(); render(); reopen(id);
+        toast("Response posted");
+      });
+      // Delete a response
+      Array.prototype.forEach.call(node.querySelectorAll("[data-delc]"),function(b){
+        b.addEventListener("click",function(){
+          var cid=b.dataset.delc; var it=find(id);
+          if(confirm("Delete this response?")){ it.comments=(it.comments||[]).filter(function(c){return c.id!==cid;}); markDirty(); render(); reopen(id); }
+        });
+      });
 
       var rt=node.querySelector("[data-retitle]"); if(rt) rt.addEventListener("click",function(){ var it=find(id); var v=prompt("Item title:",it.title); if(v&&v.trim()){ it.title=v.trim(); markDirty(); render(); reopen(id);} });
       var rp=node.querySelector("[data-repri]"); if(rp) rp.addEventListener("click",function(){ var it=find(id); var order=["high","med","low"]; var cur=order.indexOf(it.priority); it.priority=order[(cur+1)%3]; markDirty(); render(); reopen(id); toast("Priority: "+PRIORITY[it.priority]); });
@@ -440,17 +671,92 @@ window.SEED = {"project": "Shvaan Stay-N-Play", "nextNum": 18, "items": [{"id": 
   }
   function reopen(id){ var n=document.querySelector('.item[data-id="'+id+'"]'); if(n) n.classList.add("expanded"); }
 
+  // Strip transient UI chrome (ref buttons) before saving HTML
+  function cleanBody(html){
+    var d=document.createElement("div"); d.innerHTML=html;
+    Array.prototype.forEach.call(d.querySelectorAll(".refbtn"),function(b){ b.parentNode && b.parentNode.removeChild(b); });
+    return d.innerHTML;
+  }
+
+  function addRefButtons(root){
+    Array.prototype.forEach.call(root.querySelectorAll("figure"),function(fig){
+      if(fig.querySelector(".refbtn")) return;
+      var b=document.createElement("button");
+      b.className="refbtn"; b.type="button"; b.setAttribute("contenteditable","false");
+      b.setAttribute("data-ref","1"); b.textContent="ref";
+      b.title="Insert a reference to this image into your text";
+      fig.appendChild(b);
+    });
+  }
+
+  // Figure index (1-based) within its editable container
+  function figIndex(fig, root){
+    var figs=Array.prototype.slice.call(root.querySelectorAll("figure"));
+    return figs.indexOf(fig)+1;
+  }
+
+  function upgradeBody(html){
+    if(!html || html.indexOf("<img")<0) return html;
+    var d=document.createElement("div"); d.innerHTML=html;
+    Array.prototype.forEach.call(d.querySelectorAll("img"),function(img){
+      if(img.closest("figure")) return;
+      var fig=document.createElement("figure");
+      var cap=document.createElement("figcaption");
+      cap.setAttribute("contenteditable","true"); cap.setAttribute("data-cap","1");
+      cap.setAttribute("data-ph","Add a note for this image (optional)\u2026");
+      var parent=img.parentNode;
+      img.parentNode.insertBefore(fig, img); fig.appendChild(cap); fig.appendChild(img);
+      if(parent && parent.tagName==="P" && !parent.textContent.trim() && parent.children.length===0){ if(parent.parentNode) parent.parentNode.removeChild(parent); }
+    });
+    return d.innerHTML;
+  }
+
+  function insertRefChip(rte, n, savedRange){
+    var chip=document.createElement("span");
+    chip.className="imgref"; chip.setAttribute("contenteditable","false");
+    chip.textContent="["+n+"]";
+    var sel=window.getSelection();
+    var range=null;
+    if(savedRange && rte.contains(savedRange.startContainer)) range=savedRange.cloneRange();
+    if(!range){
+      // no known cursor -> append to the first paragraph, or make one
+      var p=rte.querySelector("p");
+      if(!p){ p=document.createElement("p"); rte.insertBefore(p, rte.firstChild); }
+      p.appendChild(document.createTextNode(" "));
+      p.appendChild(chip);
+      toast("Inserted ["+n+"] \u2014 click in the text first to place it exactly");
+      return;
+    }
+    range.collapse(false);
+    range.insertNode(chip);
+    // trailing space so typing continues cleanly after the chip
+    var sp=document.createTextNode("\u00A0");
+    chip.parentNode.insertBefore(sp, chip.nextSibling);
+    var r2=document.createRange(); r2.setStartAfter(sp); r2.collapse(true);
+    sel.removeAllRanges(); sel.addRange(r2);
+    rte.focus();
+  }
+
   function insertImageAtCursor(rte, url){
     rte.focus();
     var sel=window.getSelection();
+    var fig=document.createElement("figure");
+    var cap=document.createElement("figcaption");
+    cap.setAttribute("contenteditable","true");
+    cap.setAttribute("data-cap","1");
+    cap.setAttribute("data-ph","Add a note for this image (optional)…");
     var img=document.createElement("img"); img.src=url; img.alt="screenshot";
+    fig.appendChild(cap); fig.appendChild(img);
     if(sel&&sel.rangeCount&&rte.contains(sel.anchorNode)){
       var range=sel.getRangeAt(0); range.deleteContents();
-      var wrap=document.createElement("p"); wrap.appendChild(img);
-      range.insertNode(wrap);
-      range.setStartAfter(wrap); range.collapse(true); sel.removeAllRanges(); sel.addRange(range);
+      range.insertNode(fig);
+      // place cursor into the caption so you can type the note immediately
+      var r2=document.createRange(); r2.selectNodeContents(cap); r2.collapse(true);
+      sel.removeAllRanges(); sel.addRange(r2);
     } else {
-      var p=document.createElement("p"); p.appendChild(img); rte.appendChild(p);
+      rte.appendChild(fig);
+      var r3=document.createRange(); r3.selectNodeContents(cap); r3.collapse(true);
+      sel.removeAllRanges(); sel.addRange(r3);
     }
   }
 
@@ -459,7 +765,7 @@ window.SEED = {"project": "Shvaan Stay-N-Play", "nextNum": 18, "items": [{"id": 
   var imgPick=document.createElement("input"); imgPick.type="file"; imgPick.accept="image/*"; imgPick.multiple=true; imgPick.hidden=true; document.body.appendChild(imgPick);
   imgPick.addEventListener("change",function(e){
     var files=Array.prototype.slice.call(e.target.files);
-    if(imgTargetRte&&files.length){ files.forEach(function(f){ readCompress(f,function(url){ insertImageAtCursor(imgTargetRte,url); var node=imgTargetRte.closest(".item"); var it=find(node.dataset.id); it.body=imgTargetRte.innerHTML; markDirty(); }); }); }
+    if(imgTargetRte&&files.length){ files.forEach(function(f){ readCompress(f,function(url){ insertImageAtCursor(imgTargetRte,url); addRefButtons(imgTargetRte); var node=imgTargetRte.closest(".item"); var it=find(node.dataset.id); it.body=cleanBody(imgTargetRte.innerHTML); markDirty(); }); }); }
     e.target.value=""; imgTargetRte=null;
   });
 
@@ -487,7 +793,27 @@ window.SEED = {"project": "Shvaan Stay-N-Play", "nextNum": 18, "items": [{"id": 
   $("openBtn").onclick=openFile;
   $("fileInput").addEventListener("change",function(e){ var f=e.target.files[0]; if(f){ var r=new FileReader(); r.onload=function(){ loadFromText(r.result); }; r.readAsText(f); } e.target.value=""; });
 
-  $("userInput").addEventListener("input",function(){ localStorage.setItem(USER_KEY,$("userInput").value.trim()); });
+  // Pick who you are from the roster
+  $("userSelect").addEventListener("change",function(){
+    var name=$("userSelect").value;
+    localStorage.setItem(USER_KEY,name);
+    renderUser();
+    render();   // re-render so "mine" highlighting + compose author update everywhere
+  });
+
+  // Team manager
+  $("teamBtn").onclick=function(){ renderTeamList(); $("teamModal").classList.add("show"); $("newTeamName").focus(); };
+  $("teamCloseBtn").onclick=function(){ $("teamModal").classList.remove("show"); renderUser(); render(); };
+  $("teamModal").addEventListener("click",function(e){ if(e.target===$("teamModal")){ $("teamModal").classList.remove("show"); renderUser(); render(); } });
+  $("addTeamBtn").onclick=function(){
+    var v=$("newTeamName").value;
+    if(addTeamMember(v)){
+      // If you haven't picked yourself yet, assume the first person you add is you
+      if(!currentUserName()){ localStorage.setItem(USER_KEY, v.trim()); }
+      $("newTeamName").value=""; renderTeamList(); renderUser();
+    }
+  };
+  $("newTeamName").addEventListener("keydown",function(e){ if(e.key==="Enter"){ e.preventDefault(); $("addTeamBtn").click(); } });
 
   $("qaAddBtn").onclick=quickAdd;
   $("qaInput").addEventListener("keydown",function(e){ if(e.key==="Enter"){e.preventDefault(); quickAdd();} });
@@ -496,7 +822,7 @@ window.SEED = {"project": "Shvaan Stay-N-Play", "nextNum": 18, "items": [{"id": 
 
   $("closeLb").onclick=function(){$("lightbox").classList.remove("show");};
   $("lightbox").addEventListener("click",function(e){if(e.target===$("lightbox"))$("lightbox").classList.remove("show");});
-  document.addEventListener("keydown",function(e){ if(e.key==="Escape"){ $("lightbox").classList.remove("show"); } });
+  document.addEventListener("keydown",function(e){ if(e.key==="Escape"){ $("lightbox").classList.remove("show"); if($("teamModal").classList.contains("show")){ $("teamModal").classList.remove("show"); renderUser(); render(); } } });
 
   // Save shortcut
   document.addEventListener("keydown",function(e){ if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==="s"){ e.preventDefault(); saveToFile(); } });
