@@ -161,6 +161,33 @@
   .rte figure:hover .refbtn { opacity:1; }
   .refbtn:hover { border-color:var(--accent2); color:var(--accent2); background:var(--panel); }
   .rte:empty::before { content:attr(data-ph); color:var(--inkFaint); }
+  /* ---- Formatting toolbar ---- */
+  .fmtbar { display:flex; align-items:center; gap:4px; flex-wrap:wrap; margin-bottom:6px; }
+  .fmtbtn {
+    font-family:var(--sans); font-size:11.5px; line-height:1;
+    padding:5px 8px; border:1px solid var(--line); border-radius:5px;
+    background:var(--panel2); color:var(--inkDim); cursor:pointer;
+    transition:border-color .14s,background .14s,color .14s;
+  }
+  .fmtbtn:hover { border-color:var(--accent); color:var(--ink); background:var(--panelh); }
+  .fmtbtn.active { border-color:var(--accent); color:var(--accent); background:color-mix(in srgb,var(--accent) 10%,transparent); }
+  .fmtbtn.hl { background:color-mix(in srgb,#ffd54a 30%,var(--panel2)); color:var(--ink); }
+  .fmtbtn.red { color:var(--danger); }
+  .fmtsep { width:1px; height:16px; background:var(--line); margin:0 3px; }
+  .fmtbar.compact .fmtbtn { padding:4px 7px; font-size:11px; }
+
+  /* Highlighted / coloured text — inside editors AND saved content */
+  .rte mark, .comment-body mark {
+    background:#ffd54a; color:#1a1a1a; padding:1px 3px; border-radius:3px;
+  }
+  [data-theme="dark"] .rte mark, [data-theme="dark"] .comment-body mark {
+    background:#e0b32e; color:#14100a;
+  }
+  .rte .redtext, .comment-body .redtext { color:var(--danger); font-weight:500; }
+  .rte ul, .rte ol, .comment-body ul, .comment-body ol { margin:6px 0 10px 22px; }
+  .rte li, .comment-body li { margin:2px 0; }
+  .rte b, .rte strong, .comment-body b, .comment-body strong { font-weight:600; color:var(--ink); }
+
   .rte-hint { font-size:11px; color:var(--inkFaint); margin-top:7px; }
   .rte-hint b { color:var(--inkDim); }
 
@@ -307,8 +334,8 @@
   <div class="toolbar">
     <input type="text" class="search" id="search" placeholder="Search items…">
     <select class="filter" id="sortBy">
+      <option value="num" selected>Newest first</option>
       <option value="num-asc">Order: 1 → last</option>
-      <option value="num">Newest first</option>
       <option value="priority">By priority</option>
       <option value="status">By status</option>
     </select>
@@ -618,6 +645,19 @@ window.SEED = {"project": "Shvaan Stay-N-Play", "team": ["Ajay", "Developer"], "
         +'<div class="flabel">Detail'
         +'<span class="ftools"><button class="ftbtn" data-retitle>Rename</button><button class="ftbtn" data-repri>Priority</button><button class="ftbtn" data-addimg>Insert image</button><button class="ftbtn" data-del style="color:var(--danger)">Delete</button></span>'
         +'</div>'
+        +'<div class="fmtbar">'
+        +'<button class="fmtbtn" data-fmt="bold" title="Bold (Ctrl+B)"><b>B</b></button>'
+        +'<button class="fmtbtn" data-fmt="italic" title="Italic (Ctrl+I)"><i>I</i></button>'
+        +'<button class="fmtbtn" data-fmt="underline" title="Underline (Ctrl+U)"><u>U</u></button>'
+        +'<span class="fmtsep"></span>'
+        +'<button class="fmtbtn hl" data-fmt="hilite" title="Highlight">Highlight</button>'
+        +'<button class="fmtbtn red" data-fmt="red" title="Red text">Red</button>'
+        +'<span class="fmtsep"></span>'
+        +'<button class="fmtbtn" data-fmt="insertUnorderedList" title="Bullet list">&bull; List</button>'
+        +'<button class="fmtbtn" data-fmt="insertOrderedList" title="Numbered list">1. List</button>'
+        +'<span class="fmtsep"></span>'
+        +'<button class="fmtbtn" data-fmt="removeFormat" title="Clear formatting">Clear</button>'
+        +'</div>'
         +'<div class="rte" contenteditable="true" data-rte data-ph="Type freely here. Describe the change, paste or drop screenshots inline, mix text and images in any order…">'+upgradeBody(i.body||"")+'</div>'
         +'<div class="rte-hint">Type anywhere; <b>paste</b> or <b>drop</b> images right where your cursor is. Each image is auto-tagged <b>[1] [2] [3]</b> \u2014 write a note on its caption line, and click <b>ref</b> on an image to drop a reference like [2] into your text. Saves automatically.</div>'
         +'<div class="thread">'
@@ -625,6 +665,14 @@ window.SEED = {"project": "Shvaan Stay-N-Play", "team": ["Ajay", "Developer"], "
         +'<div class="comments">'+renderComments(i)+'</div>'
         +'<div class="compose">'
         +'<div class="compose-who"><span class="avatar" style="'+authorStyle(currentUserName())+'">'+escapeHtml(initialsOf(currentUserName()))+'</span><span class="compose-name">'+(currentUserName()?escapeHtml(currentUserName()):'<span style="color:var(--inkFaint)">Pick your name above to reply</span>')+'</span></div>'
+        +'<div class="fmtbar compact">'
+        +'<button class="fmtbtn" data-fmt="bold" title="Bold"><b>B</b></button>'
+        +'<button class="fmtbtn" data-fmt="italic" title="Italic"><i>I</i></button>'
+        +'<button class="fmtbtn hl" data-fmt="hilite" title="Highlight">Highlight</button>'
+        +'<button class="fmtbtn red" data-fmt="red" title="Red text">Red</button>'
+        +'<button class="fmtbtn" data-fmt="insertUnorderedList" title="Bullet list">&bull;</button>'
+        +'<button class="fmtbtn" data-fmt="removeFormat" title="Clear">Clear</button>'
+        +'</div>'
         +'<div class="rte crte" contenteditable="true" data-crte data-ph="Write a response\u2026 paste or drop screenshots inline too."></div>'
         +'<div class="compose-actions"><button class="primary sm" data-postcomment>Post response</button></div>'
         +'</div>'
@@ -662,6 +710,7 @@ window.SEED = {"project": "Shvaan Stay-N-Play", "team": ["Ajay", "Developer"], "
 
       var rte=node.querySelector("[data-rte]");
       if(rte){
+        wireFormatBar(node.querySelector(".fmtbar:not(.compact)"), rte);
         addRefButtons(rte);
         var lastRange=null;
         rte.addEventListener("keyup",function(){ var s=window.getSelection(); if(s.rangeCount && rte.contains(s.anchorNode)) lastRange=s.getRangeAt(0).cloneRange(); });
@@ -687,6 +736,7 @@ window.SEED = {"project": "Shvaan Stay-N-Play", "team": ["Ajay", "Developer"], "
       // Compose box for a new response
       var crte=node.querySelector("[data-crte]");
       if(crte){
+        wireFormatBar(node.querySelector(".fmtbar.compact"), crte);
         var cLastRange=null;
         crte.addEventListener("keyup",function(){ var s=window.getSelection(); if(s.rangeCount && crte.contains(s.anchorNode)) cLastRange=s.getRangeAt(0).cloneRange(); });
         crte.addEventListener("mouseup",function(){ var s=window.getSelection(); if(s.rangeCount && crte.contains(s.anchorNode)) cLastRange=s.getRangeAt(0).cloneRange(); });
@@ -762,6 +812,104 @@ window.SEED = {"project": "Shvaan Stay-N-Play", "team": ["Ajay", "Developer"], "
       if(parent && parent.tagName==="P" && !parent.textContent.trim() && parent.children.length===0){ if(parent.parentNode) parent.parentNode.removeChild(parent); }
     });
     return d.innerHTML;
+  }
+
+  // Apply a formatting command to the editor that owns this toolbar.
+  // Uses mousedown+preventDefault so the text selection isn't lost on click.
+  function wireFormatBar(bar, editor){
+    if(!bar || !editor) return;
+    Array.prototype.forEach.call(bar.querySelectorAll(".fmtbtn"), function(btn){
+      btn.addEventListener("mousedown", function(e){ e.preventDefault(); });  // keep selection
+      btn.addEventListener("click", function(e){
+        e.preventDefault();
+        var cmd = btn.dataset.fmt;
+        editor.focus();
+        var sel = window.getSelection();
+        // If nothing is selected, most commands do nothing useful — tell them why.
+        var hasSel = sel && sel.rangeCount && !sel.getRangeAt(0).collapsed;
+        if(!hasSel && cmd!=="insertUnorderedList" && cmd!=="insertOrderedList"){
+          toast("Select some text first");
+          return;
+        }
+        try{
+          if(cmd==="hilite"){
+            // Toggle: if already inside a <mark>, unwrap it; else wrap the selection.
+            if(inTag(sel, "MARK", editor)) unwrapTag(sel, "MARK", editor);
+            else wrapSelection(sel, "mark", null, editor);
+          } else if(cmd==="red"){
+            if(inClass(sel, "redtext", editor)) unwrapClass(sel, "redtext", editor);
+            else wrapSelection(sel, "span", "redtext", editor);
+          } else {
+            document.execCommand(cmd, false, null);
+          }
+        }catch(err){}
+        editor.dispatchEvent(new Event("input", {bubbles:true}));
+        updateFmtState(bar, editor);
+      });
+    });
+    // Reflect current state (bold on/off etc.) as you move the cursor
+    ["keyup","mouseup","focus"].forEach(function(ev){
+      editor.addEventListener(ev, function(){ updateFmtState(bar, editor); });
+    });
+  }
+
+  function updateFmtState(bar, editor){
+    var sel=window.getSelection();
+    Array.prototype.forEach.call(bar.querySelectorAll(".fmtbtn"), function(btn){
+      var cmd=btn.dataset.fmt, on=false;
+      try{
+        if(cmd==="hilite") on = inTag(sel,"MARK",editor);
+        else if(cmd==="red") on = inClass(sel,"redtext",editor);
+        else if(cmd!=="removeFormat") on = document.queryCommandState(cmd);
+      }catch(e){}
+      btn.classList.toggle("active", !!on);
+    });
+  }
+
+  function selNode(sel, editor){
+    if(!sel || !sel.rangeCount) return null;
+    var n = sel.getRangeAt(0).startContainer;
+    if(n.nodeType===3) n = n.parentNode;
+    return editor.contains(n) ? n : null;
+  }
+  function inTag(sel, tag, editor){
+    var n = selNode(sel, editor);
+    while(n && n!==editor){ if(n.tagName===tag) return true; n=n.parentNode; }
+    return false;
+  }
+  function inClass(sel, cls, editor){
+    var n = selNode(sel, editor);
+    while(n && n!==editor){ if(n.classList && n.classList.contains(cls)) return true; n=n.parentNode; }
+    return false;
+  }
+  function wrapSelection(sel, tagName, cls, editor){
+    if(!sel.rangeCount) return;
+    var range=sel.getRangeAt(0);
+    if(range.collapsed) return;
+    var el=document.createElement(tagName);
+    if(cls) el.className=cls;
+    try{
+      el.appendChild(range.extractContents());
+      range.insertNode(el);
+      // reselect the wrapped content
+      var r=document.createRange(); r.selectNodeContents(el);
+      sel.removeAllRanges(); sel.addRange(r);
+    }catch(e){}
+  }
+  function unwrapTag(sel, tag, editor){
+    var n = selNode(sel, editor);
+    while(n && n!==editor && n.tagName!==tag) n=n.parentNode;
+    if(n && n.tagName===tag) replaceWithChildren(n);
+  }
+  function unwrapClass(sel, cls, editor){
+    var n = selNode(sel, editor);
+    while(n && n!==editor && !(n.classList && n.classList.contains(cls))) n=n.parentNode;
+    if(n && n.classList && n.classList.contains(cls)) replaceWithChildren(n);
+  }
+  function replaceWithChildren(el){
+    var p=el.parentNode; if(!p) return;
+    while(el.firstChild) p.insertBefore(el.firstChild, el);
+    p.removeChild(el);
   }
 
   function insertRefChip(rte, n, savedRange){
