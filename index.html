@@ -617,7 +617,8 @@ window.SEED = {"project": "Shvaan Stay-N-Play", "team": ["Ajay", "Developer"], "
   function renderItems(){
     var q=$("search").value.trim().toLowerCase(), sort=$("sortBy").value;
     var list=db.items.slice();
-    if(filterStatus) list=list.filter(function(i){return i.status===filterStatus;});
+    var REAL_STATUSES=["open","progress","done","wontfix"];
+    if(filterStatus && REAL_STATUSES.indexOf(filterStatus)>=0) list=list.filter(function(i){return i.status===filterStatus;});
     if(q) list=list.filter(function(i){return (i.title+" "+bodyText(i.body)).toLowerCase().indexOf(q)>=0;});
     list.sort(function(a,b){
       if(sort==="num") return b.num-a.num;
